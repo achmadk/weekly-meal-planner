@@ -6,6 +6,8 @@ import { after } from 'next/server';
 
 export const maxDuration = 60;
 
+export const runtime = 'edge'
+
 export async function POST(req: Request) {
     try {
         setWaitUntil(after);
