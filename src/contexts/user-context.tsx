@@ -12,7 +12,7 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { isSignedIn, isLoaded, user } = useUser()
+  const { isSignedIn = false, isLoaded, user } = useUser()
 
   return (
     <UserContext.Provider value={{ isSignedIn, isLoaded, user }}>
