@@ -4,3 +4,5 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
   - workerd
+packages:
+  - .
