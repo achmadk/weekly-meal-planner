@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchPhotos, trackDownload } from '@/lib/unsplash';
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 export async function GET(req: NextRequest) {
     try {

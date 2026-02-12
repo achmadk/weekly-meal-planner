@@ -2,7 +2,7 @@
 
 import { AuthGuard } from '@/components/auth/auth-guard'
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 export default function DashboardPage() {
   return (
