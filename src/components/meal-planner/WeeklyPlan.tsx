@@ -12,6 +12,7 @@ interface DayPlan {
 interface WeeklyPlanProps {
   plan: DayPlan[]
   onSelectMeal: (recipe: Recipe) => void
+  isComplete?: boolean
 }
 
 const dayColors = [
@@ -24,7 +25,7 @@ const dayColors = [
   'from-red-500 to-rose-500',
 ]
 
-export function WeeklyPlan({ plan, onSelectMeal }: WeeklyPlanProps) {
+export function WeeklyPlan({ plan, onSelectMeal, isComplete = false }: WeeklyPlanProps) {
   return (
     <section className="py-24 px-6 bg-gradient-to-b from-background to-primary/5">
       <div className="max-w-7xl mx-auto">
@@ -77,18 +78,21 @@ export function WeeklyPlan({ plan, onSelectMeal }: WeeklyPlanProps) {
                   mealType="breakfast"
                   onClick={(recipe: Recipe) => onSelectMeal(recipe)}
                   delay={dayIndex * 0.1 + 0.1}
+                  {...{ isComplete }}
                 />
                 <MealCard
                   recipe={dayPlan.lunch}
                   mealType="lunch"
                   onClick={(recipe: Recipe) => onSelectMeal(recipe)}
                   delay={dayIndex * 0.1 + 0.15}
+                  {...{ isComplete }}
                 />
                 <MealCard
                   recipe={dayPlan.dinner}
                   mealType="dinner"
                   onClick={(recipe: Recipe) => onSelectMeal(recipe)}
                   delay={dayIndex * 0.1 + 0.2}
+                  {...{ isComplete }}
                 />
               </div>
             </motion.div>

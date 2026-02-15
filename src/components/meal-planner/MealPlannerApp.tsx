@@ -56,7 +56,7 @@ export function MealPlannerApp() {
             transition={{ duration: 0.5 }}
           >
             {/* @ts-ignore - Types might mismatch slightly during streaming partials but acceptable for UI rendering */}
-            <WeeklyPlan plan={weeklyPlan} onSelectMeal={handleSelectMeal} />
+            <WeeklyPlan plan={weeklyPlan} onSelectMeal={handleSelectMeal} isComplete={weeklyPlan.length === 7} />
           </motion.div>
         )}
       </AnimatePresence>

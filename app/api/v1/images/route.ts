@@ -5,6 +5,7 @@ import { searchPhotos, trackDownload } from '@/lib/unsplash';
 
 export async function GET(req: NextRequest) {
     try {
+        console.log("req: ", req);
         const { searchParams } = new URL(req.url);
         const query = searchParams.get('query') ?? null;
         const download = searchParams.get('download') ? Boolean(searchParams.get('download')) : false;

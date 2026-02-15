@@ -8,6 +8,7 @@ interface MealCardProps {
   mealType: MealType
   onClick: (recipe: Recipe) => void
   delay?: number
+  isComplete?: boolean
 }
 
 const mealTypeConfig = {
@@ -36,11 +37,12 @@ export function MealCard({
   mealType,
   onClick,
   delay = 0,
+  isComplete = false,
 }: MealCardProps) {
   const config = mealTypeConfig[mealType]
   const recipeDataIsCompleted = recipe && Object.keys(recipe).length === 12;
 
-  const { imageUrl, attribution } = useRecipeImage(recipe, recipeDataIsCompleted);
+  const { imageUrl, attribution } = useRecipeImage(recipe, isComplete && recipeDataIsCompleted);
 
   if (recipeDataIsCompleted) {
     const currentRecipe = {
