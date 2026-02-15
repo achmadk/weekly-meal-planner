@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
-  "name": "weekly-meal-generator",
+  "name": "weekly-meal-planner",
   "compatibility_date": "2026-01-16",
   "compatibility_flags": [
     "nodejs_compat",
