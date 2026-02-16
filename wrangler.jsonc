@@ -36,5 +36,8 @@
     // Enable image optimization
     // see https://opennext.js.org/cloudflare/howtos/image
     "binding": "IMAGES"
+  },
+  "limits": {
+    "cpu_ms": 300000
   }
 }
