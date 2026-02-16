@@ -1,3 +1,4 @@
+import { imageSchema } from '@/tools/image';
 import { z } from 'zod';
 
 export const RecipeSchema = z.object({
@@ -8,7 +9,7 @@ export const RecipeSchema = z.object({
     servings: z.number(),
     prepTime: z.string(),
     cookTime: z.string(),
-    imageUrl: z.string(),
+    image: z.string().nullable(),
     ingredients: z.array(z.string()),
     instructions: z.array(z.string()),
     tags: z.array(z.string()).min(5),
@@ -16,7 +17,7 @@ export const RecipeSchema = z.object({
 });
 
 export const DayPlanSchema = z.object({
-    day: z.string(),
+    day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
     breakfast: RecipeSchema,
     lunch: RecipeSchema,
     dinner: RecipeSchema,

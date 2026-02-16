@@ -114,7 +114,7 @@ export function RecipeModal({
                         label: 'Prep Time',
                         value: recipe.prepTime,
                       },
-                      ...(recipe.cookTime !== "0 minutes" ? [
+                      ...(!["0 minutes", "0 mins"].includes(recipe.cookTime) ? [
                         {
                           icon: Clock,
                           label: 'Cook Time',

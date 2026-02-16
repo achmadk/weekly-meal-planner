@@ -124,7 +124,7 @@ export function MealCard({
             >
               <span className="flex items-center gap-1">
                 <Clock size={12} />
-                {`${recipe.prepTime}${recipe.cookTime !== "0 minutes" ? ` + ${recipe.cookTime}` : ""}`}
+                {`${recipe.prepTime}${!["0 minutes", "0 mins"].includes(recipe.cookTime) ? ` + ${recipe.cookTime}` : ""}`}
               </span>
               <span className="flex items-center gap-1">
                 <Users size={12} />
