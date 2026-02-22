@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
@@ -10,7 +10,11 @@ import { WeeklyPlanSchema } from '@/schemas/meal-plan'
 import type { Recipe } from './types'
 
 export function MealPlannerApp() {
-  const { object: data, submit, isLoading } = useObject({
+  const {
+    object: data,
+    submit,
+    isLoading,
+  } = useObject({
     api: '/api/v1/meal-generators',
     schema: WeeklyPlanSchema,
   })
@@ -55,8 +59,12 @@ export function MealPlannerApp() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* @ts-ignore - Types might mismatch slightly during streaming partials but acceptable for UI rendering */}
-            <WeeklyPlan plan={weeklyPlan} onSelectMeal={handleSelectMeal} isComplete={weeklyPlan.length === 7} />
+            <WeeklyPlan
+              // @ts-ignore - Types might mismatch slightly during streaming partials but acceptable for UI rendering
+              plan={weeklyPlan}
+              onSelectMeal={handleSelectMeal}
+              isComplete={weeklyPlan.length === 7}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -66,11 +74,11 @@ export function MealPlannerApp() {
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="py-24 px-6 relative"
+          className="py-16 md:py-24 px-4 md:px-6 relative"
         >
           <div className="max-w-2xl mx-auto text-center">
             <motion.div
-              className="w-24 h-24 mx-auto mb-8 rounded-full bg-secondary/15 flex items-center justify-center border border-secondary/20"
+              className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-6 md:mb-8 rounded-full bg-secondary/15 flex items-center justify-center border border-secondary/20"
               animate={{
                 scale: [1, 1.05, 1],
               }}
@@ -78,10 +86,10 @@ export function MealPlannerApp() {
             >
               <span className="text-4xl">🍽️</span>
             </motion.div>
-            <h3 className="text-3xl font-bold text-foreground mb-4">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
               Ready to Plan Your Week?
             </h3>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
               Click the button above to generate a complete week of delicious
               meals. Each plan includes breakfast, lunch, and dinner for all 7
               days!
@@ -99,7 +107,7 @@ export function MealPlannerApp() {
       />
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
+      <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-border">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-sm text-muted-foreground">
             Made with ❤️ for food lovers everywhere

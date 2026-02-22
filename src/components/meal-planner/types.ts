@@ -7,8 +7,8 @@ export interface Recipe {
   title: string
   mealType: MealType
   description: string
-  prepTime: string
-  cookTime: string
+  prepTime: number
+  cookTime: number
   servings: number
   calories: number
   ingredients: string[]

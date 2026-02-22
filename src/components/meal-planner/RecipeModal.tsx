@@ -1,8 +1,20 @@
+'use client'
+
 import { motion, AnimatePresence } from 'motion/react'
-import { X, Clock, Users, Flame, ChefHat, Sparkles } from 'lucide-react'
+import {
+  X,
+  Clock,
+  Users,
+  Flame,
+  ChefHat,
+  Sparkles,
+  Bookmark,
+} from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { Recipe } from './types'
 import { getRecommendedRecipes } from './recipes-data'
+import { useAuth } from '@/contexts/user-context'
+import { useState } from 'react'
 
 interface RecipeModalProps {
   recipe: Recipe | null
@@ -25,8 +37,15 @@ export function RecipeModal({
 }: RecipeModalProps) {
   if (!recipe) return null
 
+  const { isSignedIn } = useAuth()
+  const [isSaved, setIsSaved] = useState(false)
+
   const recommendations = getRecommendedRecipes(recipe, 3)
   const mealConfig = mealTypeLabels[recipe.mealType]
+
+  const handleSave = () => {
+    setIsSaved(!isSaved)
+  }
 
   return (
     <AnimatePresence>
@@ -50,12 +69,14 @@ export function RecipeModal({
             className="fixed inset-4 md:inset-10 lg:inset-20 bg-background rounded-3xl shadow-2xl z-50 overflow-y-auto flex flex-col border border-border/50"
           >
             {/* Close button */}
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-foreground hover:bg-white hover:scale-110 transition-all cursor-pointer"
-            >
-              <X size={20} />
-            </button>
+            <div className="absolute top-4 right-4 z-10">
+              <button
+                onClick={onClose}
+                className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-foreground hover:bg-white hover:scale-110 transition-all cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
             <ScrollArea className="flex-1">
               <div className="flex flex-col lg:flex-row">
@@ -78,14 +99,29 @@ export function RecipeModal({
                     {/* Attribution */}
                     {recipe.attribution && (
                       <div className="absolute top-2 right-2 text-[10px] text-white/70 z-10">
-                        Photo by <a href={recipe.attribution.imgLink} target="_blank" rel="noopener noreferrer" className="underline hover:text-white">{recipe.attribution.imgName}</a> on <a href={recipe.attribution.providerLink} target="_blank" rel="noopener noreferrer" className="underline hover:text-white">Unsplash</a>
+                        Photo by{' '}
+                        <a
+                          href={recipe.attribution.imgLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline hover:text-white"
+                        >
+                          {recipe.attribution.imgName}
+                        </a>{' '}
+                        on{' '}
+                        <a
+                          href={recipe.attribution.providerLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline hover:text-white"
+                        >
+                          Unsplash
+                        </a>
                       </div>
                     )}
 
                     {/* Meal type badge */}
-                    <div
-                      className="absolute top-4 left-4 px-4 py-2 rounded-full bg-white/90 backdrop-blur-sm text-sm font-semibold flex items-center gap-2 shadow-sm"
-                    >
+                    <div className="absolute top-4 left-4 px-4 py-2 rounded-full bg-white/90 backdrop-blur-sm text-sm font-semibold flex items-center gap-2 shadow-sm">
                       <span>{mealConfig.icon}</span>
                       <span style={{ color: mealConfig.color }}>
                         {mealConfig.label}
@@ -114,13 +150,15 @@ export function RecipeModal({
                         label: 'Prep Time',
                         value: recipe.prepTime,
                       },
-                      ...(!["0 minutes", "0 mins"].includes(recipe.cookTime) ? [
-                        {
-                          icon: Clock,
-                          label: 'Cook Time',
-                          value: recipe.cookTime,
-                        },
-                      ] : []),
+                      ...(recipe.cookTime !== 0
+                        ? [
+                            {
+                              icon: Clock,
+                              label: 'Cook Time',
+                              value: recipe.cookTime,
+                            },
+                          ]
+                        : []),
                       {
                         icon: Users,
                         label: 'Servings',
@@ -143,14 +181,31 @@ export function RecipeModal({
                   </div>
 
                   {/* Calories badge */}
-                  <div
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary-foreground/90 mb-8 border border-primary/20"
-                  >
-                    <Flame className="w-4 h-4 text-primary" />
-                    <span className="font-semibold text-primary">
-                      {recipe.calories} calories
-                    </span>
-                    <span className="text-primary/70">per serving</span>
+                  <div className="flex items-center gap-2 mb-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary-foreground/90 border border-primary/20">
+                      <Flame className="w-4 h-4 text-primary" />
+                      <span className="font-semibold text-primary">
+                        {recipe.calories} calories
+                      </span>
+                      <span className="text-primary/70">per serving</span>
+                    </div>
+                    {isSignedIn && (
+                      <button
+                        onClick={handleSave}
+                        className="p-2 inline-flex items-center gap-2 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer"
+                        title={isSaved ? 'Remove from saved' : 'Save recipe'}
+                      >
+                        <Bookmark
+                          size={20}
+                          className={
+                            isSaved
+                              ? 'ml-2 fill-current text-yellow-500'
+                              : 'text-primary'
+                          }
+                        />
+                        <span className="font-semibold text-primary mr-2">{isSaved ? 'Remove from saved' : 'Save recipe'}</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Tags */}
@@ -180,7 +235,9 @@ export function RecipeModal({
                           className="flex items-start gap-3 text-muted-foreground group"
                         >
                           <span className="w-2 h-2 rounded-full bg-secondary mt-2 flex-shrink-0 group-hover:scale-125 transition-transform" />
-                          <span className="group-hover:text-foreground transition-colors">{ingredient}</span>
+                          <span className="group-hover:text-foreground transition-colors">
+                            {ingredient}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -193,10 +250,7 @@ export function RecipeModal({
                     </h3>
                     <ol className="space-y-6">
                       {recipe.instructions.map((instruction, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-4"
-                        >
+                        <li key={i} className="flex gap-4">
                           <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 font-bold text-sm border border-primary/20">
                             {i + 1}
                           </span>

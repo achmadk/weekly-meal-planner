@@ -7,8 +7,8 @@ export const breakfastRecipes: Recipe[] = [
     mealType: 'breakfast',
     description:
       'Creamy avocado on sourdough topped with perfectly poached eggs and a sprinkle of everything bagel seasoning.',
-    prepTime: '5 min',
-    cookTime: '10 min',
+    prepTime: 5,
+    cookTime: 10,
     servings: 2,
     calories: 380,
     ingredients: [
@@ -37,8 +37,8 @@ export const breakfastRecipes: Recipe[] = [
     mealType: 'breakfast',
     description:
       'Light and fluffy pancakes bursting with fresh blueberries, drizzled with pure maple syrup.',
-    prepTime: '10 min',
-    cookTime: '15 min',
+    prepTime: 10,
+    cookTime: 15,
     servings: 4,
     calories: 450,
     ingredients: [
@@ -68,8 +68,8 @@ export const breakfastRecipes: Recipe[] = [
     mealType: 'breakfast',
     description:
       'Layers of creamy Greek yogurt, crunchy granola, and fresh seasonal berries with a honey drizzle.',
-    prepTime: '5 min',
-    cookTime: '0 min',
+    prepTime: 5,
+    cookTime: 0,
     servings: 1,
     calories: 320,
     ingredients: [
@@ -95,8 +95,8 @@ export const breakfastRecipes: Recipe[] = [
     mealType: 'breakfast',
     description:
       'A fluffy three-egg omelette filled with sautéed spinach, crumbled feta, and fresh herbs.',
-    prepTime: '5 min',
-    cookTime: '8 min',
+    prepTime: 5,
+    cookTime: 8,
     servings: 1,
     calories: 340,
     ingredients: [
@@ -124,8 +124,8 @@ export const breakfastRecipes: Recipe[] = [
     mealType: 'breakfast',
     description:
       'Creamy oats soaked overnight with almond milk, topped with banana slices and almond butter.',
-    prepTime: '5 min',
-    cookTime: '0 min',
+    prepTime: 5,
+    cookTime: 0,
     servings: 1,
     calories: 380,
     ingredients: [
@@ -153,8 +153,8 @@ export const breakfastRecipes: Recipe[] = [
     mealType: 'breakfast',
     description:
       'A hearty flour tortilla stuffed with scrambled eggs, crispy bacon, cheese, and fresh salsa.',
-    prepTime: '10 min',
-    cookTime: '15 min',
+    prepTime: 10,
+    cookTime: 15,
     servings: 2,
     calories: 520,
     ingredients: [
@@ -183,8 +183,8 @@ export const breakfastRecipes: Recipe[] = [
     mealType: 'breakfast',
     description:
       'A vibrant purple smoothie bowl topped with fresh fruits, coconut flakes, and crunchy granola.',
-    prepTime: '10 min',
-    cookTime: '0 min',
+    prepTime: 10,
+    cookTime: 0,
     servings: 1,
     calories: 350,
     ingredients: [
@@ -212,8 +212,8 @@ export const breakfastRecipes: Recipe[] = [
     mealType: 'breakfast',
     description:
       'Classic French toast made with brioche, dusted with powdered sugar and served with fresh berries.',
-    prepTime: '5 min',
-    cookTime: '10 min',
+    prepTime: 5,
+    cookTime: 10,
     servings: 2,
     calories: 420,
     ingredients: [
@@ -245,8 +245,8 @@ export const lunchRecipes: Recipe[] = [
     mealType: 'lunch',
     description:
       'A colorful bowl of fluffy quinoa with cucumber, tomatoes, olives, feta, and lemon herb dressing.',
-    prepTime: '15 min',
-    cookTime: '20 min',
+    prepTime: 15,
+    cookTime: 20,
     servings: 2,
     calories: 420,
     ingredients: [
@@ -277,8 +277,8 @@ export const lunchRecipes: Recipe[] = [
     mealType: 'lunch',
     description:
       'Crisp romaine lettuce with grilled chicken, parmesan, croutons, and creamy Caesar dressing.',
-    prepTime: '15 min',
-    cookTime: '15 min',
+    prepTime: 15,
+    cookTime: 15,
     servings: 2,
     calories: 480,
     ingredients: [
@@ -307,8 +307,8 @@ export const lunchRecipes: Recipe[] = [
     mealType: 'lunch',
     description:
       'Fresh ahi tuna cubes with sushi rice, avocado, edamame, and spicy mayo drizzle.',
-    prepTime: '20 min',
-    cookTime: '20 min',
+    prepTime: 20,
+    cookTime: 20,
     servings: 2,
     calories: 520,
     ingredients: [
@@ -339,8 +339,8 @@ export const lunchRecipes: Recipe[] = [
     mealType: 'lunch',
     description:
       'Warm pressed sandwich with fresh mozzarella, ripe tomatoes, basil, and balsamic glaze.',
-    prepTime: '10 min',
-    cookTime: '8 min',
+    prepTime: 10,
+    cookTime: 8,
     servings: 1,
     calories: 450,
     ingredients: [
@@ -369,8 +369,8 @@ export const lunchRecipes: Recipe[] = [
     mealType: 'lunch',
     description:
       'Savory ground chicken with Thai spices served in crisp butter lettuce cups.',
-    prepTime: '15 min',
-    cookTime: '10 min',
+    prepTime: 15,
+    cookTime: 10,
     servings: 2,
     calories: 320,
     ingredients: [
@@ -402,8 +402,8 @@ export const lunchRecipes: Recipe[] = [
     mealType: 'lunch',
     description:
       'Velvety smooth roasted butternut squash soup with a hint of sage and cream.',
-    prepTime: '15 min',
-    cookTime: '40 min',
+    prepTime: 15,
+    cookTime: 40,
     servings: 4,
     calories: 280,
     ingredients: [
@@ -433,8 +433,8 @@ export const lunchRecipes: Recipe[] = [
     mealType: 'lunch',
     description:
       'Crispy homemade falafel in warm pita with hummus, pickled vegetables, and tahini sauce.',
-    prepTime: '20 min',
-    cookTime: '15 min',
+    prepTime: 20,
+    cookTime: 15,
     servings: 2,
     calories: 480,
     ingredients: [
@@ -465,8 +465,8 @@ export const lunchRecipes: Recipe[] = [
     mealType: 'lunch',
     description:
       'Zesty lime-marinated shrimp in corn tortillas with cabbage slaw and chipotle crema.',
-    prepTime: '15 min',
-    cookTime: '10 min',
+    prepTime: 15,
+    cookTime: 10,
     servings: 2,
     calories: 380,
     ingredients: [
@@ -499,8 +499,8 @@ export const dinnerRecipes: Recipe[] = [
     mealType: 'dinner',
     description:
       'Perfectly baked salmon with a crispy herb crust, served with roasted asparagus and lemon.',
-    prepTime: '10 min',
-    cookTime: '20 min',
+    prepTime: 10,
+    cookTime: 20,
     servings: 2,
     calories: 480,
     ingredients: [
@@ -530,8 +530,8 @@ export const dinnerRecipes: Recipe[] = [
     mealType: 'dinner',
     description:
       'Tender strips of beef with colorful vegetables in a savory ginger-soy sauce over rice.',
-    prepTime: '20 min',
-    cookTime: '15 min',
+    prepTime: 20,
+    cookTime: 15,
     servings: 4,
     calories: 520,
     ingredients: [
@@ -562,8 +562,8 @@ export const dinnerRecipes: Recipe[] = [
     mealType: 'dinner',
     description:
       'Pan-seared chicken breasts in a rich sun-dried tomato and spinach cream sauce.',
-    prepTime: '10 min',
-    cookTime: '25 min',
+    prepTime: 10,
+    cookTime: 25,
     servings: 4,
     calories: 550,
     ingredients: [
@@ -593,8 +593,8 @@ export const dinnerRecipes: Recipe[] = [
     mealType: 'dinner',
     description:
       'Classic Thai rice noodles with tofu, bean sprouts, peanuts, and tangy tamarind sauce.',
-    prepTime: '20 min',
-    cookTime: '15 min',
+    prepTime: 20,
+    cookTime: 15,
     servings: 3,
     calories: 450,
     ingredients: [
@@ -625,8 +625,8 @@ export const dinnerRecipes: Recipe[] = [
     mealType: 'dinner',
     description:
       'Perfectly grilled lamb chops with fresh mint chimichurri and roasted baby potatoes.',
-    prepTime: '15 min',
-    cookTime: '20 min',
+    prepTime: 15,
+    cookTime: 20,
     servings: 2,
     calories: 620,
     ingredients: [
@@ -656,8 +656,8 @@ export const dinnerRecipes: Recipe[] = [
     mealType: 'dinner',
     description:
       'Creamy arborio rice slowly cooked with wild mushrooms, white wine, and parmesan.',
-    prepTime: '10 min',
-    cookTime: '35 min',
+    prepTime: 10,
+    cookTime: 35,
     servings: 4,
     calories: 480,
     ingredients: [
@@ -687,8 +687,8 @@ export const dinnerRecipes: Recipe[] = [
     mealType: 'dinner',
     description:
       'Slow-cooked pork shoulder in smoky BBQ sauce, served on brioche buns with coleslaw.',
-    prepTime: '15 min',
-    cookTime: '6 hours',
+    prepTime: 15,
+    cookTime: 6,
     servings: 8,
     calories: 580,
     ingredients: [
@@ -718,8 +718,8 @@ export const dinnerRecipes: Recipe[] = [
     mealType: 'dinner',
     description:
       'Layers of breaded eggplant, marinara sauce, and melted mozzarella baked to perfection.',
-    prepTime: '30 min',
-    cookTime: '45 min',
+    prepTime: 30,
+    cookTime: 45,
     servings: 6,
     calories: 420,
     ingredients: [

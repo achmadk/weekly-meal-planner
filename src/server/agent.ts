@@ -1,29 +1,45 @@
-import { Agent, VoltAgent } from "@voltagent/core";
-import { recipeImageTool } from "@/tools/image";
-import { createOpenAI } from "@ai-sdk/openai";
-import { honoServer } from "@voltagent/server-hono";
+import { Agent, VoltAgent } from '@voltagent/core'
+import { recipeImageTool } from '@/tools/image'
+import { createOpenAI } from '@ai-sdk/openai'
+import { honoServer } from '@voltagent/server-hono'
 
-const deploymentMode = process.env.DEPLOYMENT_MODE ?? "local";
+const deploymentMode = process.env.DEPLOYMENT_MODE ?? 'local'
 
 const openAI = createOpenAI({
-  baseURL: "https://ai.sumopod.com",
-  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: 'https://ai.sumopod.com',
+  apiKey: process.env.OPENAPI_API_KEY,
+  // baseURL: "https://agentready.cloud/v1",
+  // apiKey: process.env.AGENTREADY_API_KEY,
+  // headers: {
+  //   "X-Upstream-API-Key": process.env.OPENAPI_API_KEY ?? "",
+  // }
 })
 
+// const openAI = createGoogleGenerativeAI({
+//   baseURL: "https://ai.sumopod.com",
+//   apiKey: process.env.OPENAPI_API_KEY,
+//   // baseURL: "https://agentready.cloud/v1",
+//   // apiKey: process.env.AGENTREADY_API_KEY,
+//   // headers: {
+//   //   "X-Upstream-API-Key": process.env.OPENAPI_API_KEY ?? "",
+//   // }
+// })
+
 // export const model = openAI.responses("gpt-4o-mini")
-export const model = openAI.responses("gpt-4.1")
+export const model = openAI("gpt-4.1")
 
 // Define the meal planning agent
 export const mealAgent = new Agent({
-  name: "meal-agent",
-  purpose: "A helpful agent that generates meal plans, its recipes, and grocery lists.",
+  name: 'meal-agent',
+  purpose:
+    'A helpful agent that generates meal plans, its recipes, and grocery lists.',
   model,
   instructions: `You are a specialized meal planning assistant. 
   Your goal is to help users generate delicious, healthy meal plans for the breakfast, lunch, and dinner for a week, find recipes, and organize their grocery lists.
-  Be creative, consider dietary restrictions if mentioned, and provide clear, structured output.`
+  Be creative, consider dietary restrictions if mentioned, and provide clear, structured output.`,
   // IMPORTANT: Use the 'recipeImageTool' to find a high-quality real image for each recipe and populate the 'image' field with the URL returned by the tool.`,
   // tools: [recipeImageTool],
-});
+})
 
 // Initialize the VoltAgent server instance
 new VoltAgent({
@@ -31,4 +47,4 @@ new VoltAgent({
   server: honoServer({
     port: 3141,
   }),
-});
+})

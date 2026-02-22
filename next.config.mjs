@@ -1,8 +1,11 @@
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
+import { withPWA } from '@swavoti/next-pwa'
 
-initOpenNextCloudflareForDev();
+initOpenNextCloudflareForDev()
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
 
-export default nextConfig;
+}
+
+export default withPWA(nextConfig)
