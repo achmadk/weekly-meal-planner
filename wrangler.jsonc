@@ -45,7 +45,7 @@
 	},
 	"d1_databases": [
 		{
-			"binding": "wmp_d1_binding",
+			"binding": "NEXT_TAG_CACHE_D1",
 			"database_name": "wmp-d1-binding",
 			"database_id": "cb55d41a-5dab-410f-b413-d1c6725a25f4",
 			"remote": true
