@@ -11,7 +11,7 @@ export interface Env {
 
 export function createDbClient() {
   const pool = postgres(process.env.DATABASE_URL!, {
-    prepare: true,
+    prepare: false,
   })
 
   return drizzle(pool, { schema })
