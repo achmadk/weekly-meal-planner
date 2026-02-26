@@ -1,45 +1,45 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "main": ".open-next/worker.js",
-  "name": "weekly-meal-planner",
-  "compatibility_date": "2026-01-16",
-  "compatibility_flags": [
-    "nodejs_compat",
-    "nodejs_compat_populate_process_env",
-    "no_handle_cross_request_promise_resolution",
-    "global_fetch_strictly_public",
-  ],
-  "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS",
-  },
-  "services": [
-    {
-      "binding": "WORKER_SELF_REFERENCE",
-      "service": "weekly-meal-planner",
-    },
-  ],
-  "r2_buckets": [
-    {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "cache",
-    },
-  ],
-  "images": {
-    "binding": "IMAGES",
-  },
-  "hyperdrive": [
-    {
-      "binding": "HYPERDRIVE",
-      "id": "<your-hyperdrive-id-here>",
-    },
-  ],
-  "limits": {
-    "cpu_ms": 300000,
-  },
-  "observability": {
-    "logs": {
-      "enabled": true,
-    },
-  },
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "weekly-meal-planner",
+	"compatibility_date": "2026-01-16",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"nodejs_compat_populate_process_env",
+		"no_handle_cross_request_promise_resolution",
+		"global_fetch_strictly_public",
+	],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS",
+	},
+	"services": [
+		{
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "weekly-meal-planner",
+		},
+	],
+	"r2_buckets": [
+		{
+			"binding": "NEXT_INC_CACHE_R2_BUCKET",
+			"bucket_name": "cache",
+		},
+	],
+	"images": {
+		"binding": "IMAGES",
+	},
+	"hyperdrive": [
+		{
+			"binding": "HYPERDRIVE",
+			"id": "6dce194bb96a407fa4eceffdb5dff740"
+		},
+	],
+	"limits": {
+		"cpu_ms": 300000,
+	},
+	"observability": {
+		"logs": {
+			"enabled": true,
+		},
+	},
 }
