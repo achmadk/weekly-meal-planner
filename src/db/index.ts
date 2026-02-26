@@ -1,6 +1,6 @@
 import type { Hyperdrive } from '@cloudflare/workers-types'
-import { drizzle } from 'drizzle-orm/mysql2'
-import { createConnection } from 'mysql2/promise'
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { Pool } from 'pg'
 import * as schema from './schema'
 
 export type DbClient = ReturnType<typeof drizzle<typeof schema>>
@@ -10,14 +10,13 @@ export interface Env {
 }
 
 export async function createDbClient(env: Env['HYPERDRIVE']) {
-  const connection = await createConnection({
+  const pool = new Pool({
     host: env.host,
     user: env.user,
     password: env.password,
     database: env.database,
     port: env.port,
-    disableEval: true,
   })
 
-  return drizzle(connection, { schema, mode: 'default' })
+  return drizzle(pool, { schema })
 }

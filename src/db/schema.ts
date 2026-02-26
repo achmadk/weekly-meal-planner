@@ -1,23 +1,25 @@
 import {
-  mysqlTable,
+  pgTable,
   serial,
   varchar,
   timestamp,
   text,
-  int,
-} from 'drizzle-orm/mysql-core'
+  integer,
+} from 'drizzle-orm/pg-core'
 
-export const mealPlans = mysqlTable('meal_plans', {
+export const mealPlans = pgTable('meal_plans', {
   id: serial('id').primaryKey(),
   userId: varchar('user_id', { length: 255 }).notNull(),
   weekStart: timestamp('week_start').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
 })
 
-export const meals = mysqlTable('meals', {
+export const meals = pgTable('meals', {
   id: serial('id').primaryKey(),
-  mealPlanId: int('meal_plan_id').notNull(),
+  mealPlanId: integer('meal_plan_id').notNull(),
   dayOfWeek: varchar('day_of_week', { length: 20 }).notNull(),
   mealType: varchar('meal_type', { length: 20 }).notNull(),
   recipeId: varchar('recipe_id', { length: 255 }),
@@ -28,7 +30,7 @@ export const meals = mysqlTable('meals', {
   createdAt: timestamp('created_at').defaultNow(),
 })
 
-export const recipes = mysqlTable('recipes', {
+export const recipes = pgTable('recipes', {
   id: serial('id').primaryKey(),
   externalId: varchar('external_id', { length: 255 }).unique(),
   name: varchar('name', { length: 255 }).notNull(),
@@ -36,18 +38,20 @@ export const recipes = mysqlTable('recipes', {
   ingredients: text('ingredients'),
   instructions: text('instructions'),
   imageUrl: varchar('image_url', { length: 500 }),
-  prepTime: int('prep_time'),
-  cookTime: int('cook_time'),
-  servings: int('servings'),
+  prepTime: integer('prep_time'),
+  cookTime: integer('cook_time'),
+  servings: integer('servings'),
   createdAt: timestamp('created_at').defaultNow(),
 })
 
-export const userLimits = mysqlTable('user_limits', {
+export const userLimits = pgTable('user_limits', {
   id: serial('id').primaryKey(),
   userId: varchar('user_id', { length: 255 }).notNull().unique(),
-  generationLimit: int('generation_limit').notNull().default(5),
-  generationUsed: int('generation_used').notNull().default(0),
+  generationLimit: integer('generation_limit').notNull().default(5),
+  generationUsed: integer('generation_used').notNull().default(0),
   lastResetAt: timestamp('last_reset_at').defaultNow(),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
 })
