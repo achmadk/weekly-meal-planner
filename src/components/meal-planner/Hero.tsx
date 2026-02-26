@@ -1,24 +1,85 @@
+'use client'
+
+import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'motion/react'
-import { Sparkles, ChefHat, Calendar } from 'lucide-react'
+import { Sparkles, ChefHat, Calendar, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AuthButtons } from '@/components/auth/auth-buttons'
 import Link from 'next/link'
 import { NavigationMenu } from '../navigation/Menu'
+import { useAuth } from '@/contexts/user-context'
 
 interface HeroProps {
   onGenerate: () => void
   isGenerating: boolean
 }
 
+interface LimitInfo {
+  allowed: boolean
+  remaining: number
+  limit: number
+  isPublic: boolean
+}
+
 export function Hero({ onGenerate, isGenerating }: HeroProps) {
+  const { isSignedIn, user, isLoaded } = useAuth()
+  const [limitInfo, setLimitInfo] = useState<LimitInfo | null>(null)
+  const [isLoadingLimit, setIsLoadingLimit] = useState(true)
+
+  const fetchLimit = useCallback(async () => {
+    setIsLoadingLimit(true)
+    try {
+      const userId = user?.id
+      const res = await fetch('/api/v1/generation-limits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'check' }),
+      })
+      const data = await res.json()
+      setLimitInfo(data)
+    } catch (error) {
+      console.error('Failed to fetch limit:', error)
+    } finally {
+      setIsLoadingLimit(false)
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    if (isLoaded) {
+      fetchLimit()
+    }
+  }, [isLoaded, fetchLimit])
+
+  const handleGenerate = useCallback(async () => {
+    if (!limitInfo?.allowed) {
+      return
+    }
+
+    const userId = user?.id
+
+    if (!limitInfo.isPublic) {
+      try {
+        await fetch('/api/v1/generation-limits', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, action: 'decrement' }),
+        })
+      } catch (error) {
+        console.error('Failed to decrement limit:', error)
+      }
+    }
+
+    onGenerate()
+    fetchLimit()
+  }, [limitInfo, user?.id, onGenerate, fetchLimit])
+
+  const showLoginPrompt = !limitInfo?.allowed && limitInfo?.isPublic === false
+  const isDisabled = isGenerating || isLoadingLimit || !limitInfo?.allowed
+
   return (
     <section className="relative min-h-[60vh] md:min-h-[70vh] flex items-center justify-center overflow-hidden px-4 sm:px-6">
-      {/* Background gradient mesh */}
-      {/* <div className="absolute inset-0 bg-gradient-to-br from-[#F4F1DE] via-[#FFF8F0] to-[#E8F5E9]" /> */}
-      {/* Handled by global layout now but we can add a localized highlight */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background/80 pointer-events-none" />
 
-      {/* Decorative circles - smaller on mobile */}
       <motion.div
         className="absolute top-20 -left-20 w-48 h-48 md:w-96 md:h-96 rounded-full bg-primary/10 blur-3xl"
         animate={{
@@ -36,7 +97,6 @@ export function Hero({ onGenerate, isGenerating }: HeroProps) {
         transition={{ duration: 10, repeat: Infinity }}
       />
 
-      {/* Floating food icons - hidden on small mobile, visible on md+ */}
       <motion.div
         className="hidden md:block absolute top-32 right-[15%] text-primary/80"
         animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
@@ -52,15 +112,12 @@ export function Hero({ onGenerate, isGenerating }: HeroProps) {
         <Calendar size="15rem" strokeWidth={3} />
       </motion.div>
 
-      {/* Auth Buttons */}
       <div className="absolute top-6 right-6 z-20">
         <AuthButtons />
       </div>
 
-      {/* Navigation Links */}
       <NavigationMenu />
 
-      {/* Content */}
       <div className="relative z-10 text-center px-4 sm:px-8 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -89,7 +146,7 @@ export function Hero({ onGenerate, isGenerating }: HeroProps) {
         </motion.h1>
 
         <motion.p
-          className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 md:mb-12 max-w-xl mx-auto leading-relaxed"
+          className="text-base sm:text-lg md:text-xl text-muted-foreground mb-4 md:mb-6 max-w-xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -98,31 +155,72 @@ export function Hero({ onGenerate, isGenerating }: HeroProps) {
           one click.
         </motion.p>
 
+        {!isLoadingLimit && limitInfo && (
+          <motion.p
+            className="text-sm text-muted-foreground mb-6 md:mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.25 }}
+          >
+            {!isSignedIn && (
+              <span className="text-amber-600">
+                Public user: {limitInfo.remaining} generation left
+              </span>
+            )}
+            {isSignedIn && limitInfo.allowed && (
+              <span className="text-green-600">
+                Logged in: {limitInfo.remaining}/{limitInfo.limit} generations
+                this month
+              </span>
+            )}
+            {showLoginPrompt && (
+              <span className="text-red-500">
+                No generations left. Please login to get 2 extra generations!
+              </span>
+            )}
+          </motion.p>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <Button
-            onClick={onGenerate}
-            disabled={isGenerating}
-            size="lg"
-            className="group relative px-6 py-5 md:px-10 md:py-8 text-base md:text-xl font-semibold rounded-xl md:rounded-2xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground shadow-2xl shadow-primary/25 transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1 border-b-4 border-primary/20 active:border-b-0 active:translate-y-1 cursor-pointer"
-          >
-            <motion.span
-              className="flex items-center gap-2 md:gap-3"
-              animate={isGenerating ? { opacity: [1, 0.5, 1] } : {}}
-              transition={{ duration: 1, repeat: Infinity }}
+          {showLoginPrompt ? (
+            <Link href="/sign-in">
+              <Button
+                size="lg"
+                className="group relative px-6 py-5 md:px-10 md:py-8 text-base md:text-xl font-semibold rounded-xl md:rounded-2xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground shadow-2xl shadow-primary/25 transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1 border-b-4 border-primary/20 active:border-b-0 active:translate-y-1 cursor-pointer"
+              >
+                <span className="flex items-center gap-2 md:gap-3">
+                  <Lock className="w-5 h-5 md:w-6 md:h-6" />
+                  <span className="whitespace-nowrap">
+                    Login for 2 Extra Generations
+                  </span>
+                </span>
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              onClick={handleGenerate}
+              disabled={isDisabled}
+              size="lg"
+              className="group relative px-6 py-5 md:px-10 md:py-8 text-base md:text-xl font-semibold rounded-xl md:rounded-2xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground shadow-2xl shadow-primary/25 transition-all duration-300 hover:shadow-primary/40 hover:-translate-y-1 border-b-4 border-primary/20 active:border-b-0 active:translate-y-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
-              <span className="whitespace-nowrap">
-                {isGenerating ? 'Generating...' : 'Generate Plan'}
-              </span>
-            </motion.span>
-          </Button>
+              <motion.span
+                className="flex items-center gap-2 md:gap-3"
+                animate={isGenerating ? { opacity: [1, 0.5, 1] } : {}}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
+                <span className="whitespace-nowrap">
+                  {isGenerating ? 'Generating...' : 'Generate Plan'}
+                </span>
+              </motion.span>
+            </Button>
+          )}
         </motion.div>
 
-        {/* Stats - responsive grid */}
         <motion.div
           className="flex flex-wrap justify-center gap-6 md:gap-12 mt-12 md:mt-20"
           initial={{ opacity: 0 }}

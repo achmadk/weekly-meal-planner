@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { motion, TargetAndTransition } from 'motion/react'
 import { Clock, Users, Flame, Bookmark } from 'lucide-react'
 import type { Recipe, MealType } from './types'
 import { useRecipeImage } from '@/hooks/useRecipeImage'
@@ -69,7 +69,7 @@ export function MealCard({
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay }}
-        whileHover={{ y: -8, transition: { duration: 0.2 } }}
+        whileHover={{ y: -8, transition: { duration: 0.2 } } as TargetAndTransition}
         onClick={() => onClick(currentRecipe)}
         className="group cursor-pointer"
       >

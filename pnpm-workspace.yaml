@@ -1,8 +1,10 @@
+packages:
+  - .
+
 onlyBuiltDependencies:
   - '@clerk/shared'
+  - '@swc/core'
   - esbuild
   - protobufjs
   - sharp
   - workerd
-packages:
-  - .

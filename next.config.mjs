@@ -1,11 +1,21 @@
-import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
-import { withPWA } from '@swavoti/next-pwa'
+const deploymentMode = process.env.DEPLOYMENT_MODE ?? 'local'
 
-initOpenNextCloudflareForDev()
+if (deploymentMode === 'cloudflare') {
+  const { initOpenNextCloudflareForDev } =
+    await import('@opennextjs/cloudflare')
+  initOpenNextCloudflareForDev()
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  // enablePrerenderSourceMaps: false,
+  // experimental: {
+  //   prerenderEarlyExit: false
+  // }
 }
 
-export default withPWA(nextConfig)
+// export default withSerwist(nextConfig);
+export default nextConfig

@@ -9,6 +9,7 @@ import {
   ChefHat,
   Sparkles,
   Bookmark,
+  BookOpen,
 } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { Recipe } from './types'
@@ -203,7 +204,9 @@ export function RecipeModal({
                               : 'text-primary'
                           }
                         />
-                        <span className="font-semibold text-primary mr-2">{isSaved ? 'Remove from saved' : 'Save recipe'}</span>
+                        <span className="font-semibold text-primary mr-2">
+                          {isSaved ? 'Remove from saved' : 'Save recipe'}
+                        </span>
                       </button>
                     )}
                   </div>
@@ -246,6 +249,7 @@ export function RecipeModal({
                   {/* Instructions */}
                   <div className="mb-10">
                     <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+                      <BookOpen className="w-6 h-6 text-primary" />
                       Instructions
                     </h3>
                     <ol className="space-y-6">

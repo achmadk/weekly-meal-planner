@@ -7,42 +7,39 @@
     "nodejs_compat",
     "nodejs_compat_populate_process_env",
     "no_handle_cross_request_promise_resolution",
-    "global_fetch_strictly_public"
+    "global_fetch_strictly_public",
   ],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
   },
   "services": [
     {
-      // Self-reference service binding, the service name must match the worker name
-      // see https://opennext.js.org/cloudflare/caching
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "weekly-meal-planner"
-    }
+      "service": "weekly-meal-planner",
+    },
   ],
   "r2_buckets": [
-    // Use R2 incremental cache
-    // See https://opennext.js.org/cloudflare/caching
     {
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      // Create the bucket before deploying
-      // You can change the bucket name if you want
-      // See https://developers.cloudflare.com/workers/wrangler/commands/#r2-bucket-create
-      "bucket_name": "cache"
-    }
+      "bucket_name": "cache",
+    },
   ],
   "images": {
-    // Enable image optimization
-    // see https://opennext.js.org/cloudflare/howtos/image
-    "binding": "IMAGES"
+    "binding": "IMAGES",
   },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "<your-hyperdrive-id-here>",
+    },
+  ],
   "limits": {
-    "cpu_ms": 300000
+    "cpu_ms": 300000,
   },
   "observability": {
     "logs": {
-      "enabled": true
-    }
-  }
+      "enabled": true,
+    },
+  },
 }
