@@ -9,14 +9,8 @@ export interface Env {
   HYPERDRIVE: Hyperdrive
 }
 
-export async function createDbClient(env: Env['HYPERDRIVE']) {
-  const pool = new Pool({
-    host: env.host,
-    user: env.user,
-    password: env.password,
-    database: env.database,
-    port: env.port,
-  })
+export function createDbClient() {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 
   return drizzle(pool, { schema })
 }

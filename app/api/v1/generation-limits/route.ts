@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/server/lib/db-api'
 import { userLimits } from '@/db/schema'
-import { eq, and, gt, sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { subMonths } from 'date-fns'
+import { createDbClient } from '@/db'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { userId, action } = body
 
-    const db = await getDb()
+    const db = createDbClient()
 
     if (action === 'check') {
       if (!userId) {
