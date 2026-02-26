@@ -43,4 +43,12 @@
 			"enabled": true,
 		},
 	},
+	"d1_databases": [
+		{
+			"binding": "wmp_d1_binding",
+			"database_name": "wmp-d1-binding",
+			"database_id": "cb55d41a-5dab-410f-b413-d1c6725a25f4",
+			"remote": true
+		}
+	],
 }
