@@ -31,7 +31,8 @@
 	"hyperdrive": [
 		{
 			"binding": "HYPERDRIVE",
-			"id": "6dce194bb96a407fa4eceffdb5dff740"
+			"id": "6dce194bb96a407fa4eceffdb5dff740",
+			"localConnectionString": "postgresql://postgres:password@db.your-project.supabase.co:5432/postgres"
 		},
 	],
 	"limits": {
