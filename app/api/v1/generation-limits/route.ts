@@ -1,126 +1,97 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
-import { userLimits } from '@/db/schema'
 import { eq } from 'drizzle-orm'
-import { subMonths } from 'date-fns'
-import { createDbClient } from '@/db'
+import { subMonths, isBefore } from 'date-fns'
 
+import { db } from '@/db'
+
+import { userLimits } from '@/db/schema'
+
+export type MealGenerationLimitsRequestBody = {
+  userId: string
+  action: "CHECK"
+} | {
+  userId: string
+  action: "SET_VALUE"
+  remainingCount: number
+}
+
+export type MealGenerationLimitsCheckResponseBody = {
+  allowed: boolean
+  remaining: number
+  limit: number
+}
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { userId, action } = body
+    const body = await req.json() as MealGenerationLimitsRequestBody
 
-    const db = createDbClient()
-
-    if (action === 'check') {
-      if (!userId) {
-        return NextResponse.json({
-          allowed: true,
-          remaining: 1,
-          limit: 1,
-          isPublic: true,
-        })
-      }
-
-      const results = await (db as any)
+    if (body.action === 'CHECK') {
+      const results = await db
         .select()
         .from(userLimits)
-        .where(eq(userLimits.userId, userId))
-      const userLimit = results[0]
+        .where(eq(userLimits.userId, body.userId))
+        .limit(1)
+      const userLimit = results?.[0] ?? null;
 
       const now = new Date()
       const oneMonthAgo = subMonths(now, 1)
 
-      if (userLimit && userLimit.lastResetAt) {
+      if (userLimit?.lastResetAt) {
         const lastReset = new Date(userLimit.lastResetAt)
-        if (lastReset < oneMonthAgo) {
-          await (db as any)
+        if (isBefore(lastReset, oneMonthAgo)) {
+        // if (lastReset < oneMonthAgo) {
+          await db
             .update(userLimits)
             .set({
               generationUsed: 0,
               lastResetAt: now,
               updatedAt: now,
             })
-            .where(eq(userLimits.userId, userId))
+            .where(eq(userLimits.userId, body.userId))
 
           return NextResponse.json({
             allowed: true,
-            remaining: 5,
-            limit: 5,
-            isPublic: false,
+            remaining: 7,
+            limit: 7,
           })
         }
       }
 
       const remaining = userLimit
         ? userLimit.generationLimit - userLimit.generationUsed
-        : 5
+        : 7
 
       return NextResponse.json({
         allowed: remaining > 0,
         remaining: Math.max(0, remaining),
-        limit: 5,
-        isPublic: false,
+        limit: 7,
       })
     }
 
-    if (action === 'decrement') {
-      if (!userId) {
-        return NextResponse.json({ success: true })
-      }
-
-      const results = await (db as any)
+    if (body.action === "SET_VALUE") {
+      const results = await db
         .select()
         .from(userLimits)
-        .where(eq(userLimits.userId, userId))
-      const userLimit = results[0]
+        .where(eq(userLimits.userId, body.userId))
+        .limit(1)
+      const userLimit = results?.[0] ?? null;
 
+      const generationUsed = 7 - body.remainingCount;
       if (!userLimit) {
-        await (db as any).insert(userLimits).values({
-          userId,
-          generationLimit: 5,
-          generationUsed: 1,
-          lastResetAt: new Date(),
-        })
-      } else {
-        await (db as any)
-          .update(userLimits)
-          .set({
-            generationUsed: userLimit.generationUsed + 1,
-            updatedAt: new Date(),
-          })
-          .where(eq(userLimits.userId, userId))
-      }
-
-      return NextResponse.json({ success: true })
-    }
-
-    if (action === 'add') {
-      if (!userId) {
-        return NextResponse.json({ success: false })
-      }
-
-      const results = await (db as any)
-        .select()
-        .from(userLimits)
-        .where(eq(userLimits.userId, userId))
-      const userLimit = results[0]
-
-      if (!userLimit) {
-        await (db as any).insert(userLimits).values({
-          userId,
+        await db.insert(userLimits).values({
+          userId: body.userId,
           generationLimit: 7,
-          generationUsed: 0,
+          generationUsed,
           lastResetAt: new Date(),
         })
       } else {
-        await (db as any)
+        await db
           .update(userLimits)
           .set({
-            generationLimit: (userLimit.generationLimit ?? 5) + 2,
+            generationUsed,
             updatedAt: new Date(),
           })
-          .where(eq(userLimits.userId, userId))
+          .where(eq(userLimits.userId, body.userId))
       }
 
       return NextResponse.json({ success: true })

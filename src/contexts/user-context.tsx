@@ -5,17 +5,20 @@ import { useUser } from '@clerk/nextjs'
 
 interface UserContextType {
   isSignedIn: boolean
-  isLoaded: boolean
   user: any | null
+  userId: string | null
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { isSignedIn = false, isLoaded, user } = useUser()
+  const { isSignedIn: initialIsSignedIn = false, isLoaded, user } = useUser()
+
+  const userId = user?.id ?? null;
+  const isSignedIn = isLoaded && initialIsSignedIn
 
   return (
-    <UserContext.Provider value={{ isSignedIn, isLoaded, user }}>
+    <UserContext.Provider value={{ isSignedIn, user, userId }}>
       {children}
     </UserContext.Provider>
   )
