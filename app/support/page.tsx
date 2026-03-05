@@ -137,10 +137,24 @@ export default function SupportPage() {
 
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="max-w-7xl mx-auto text-center space-y-4">
           <p className="text-sm text-muted-foreground">
             Made with ❤️ for food lovers everywhere
           </p>
+          <div className="flex justify-center gap-6 text-sm">
+            <Link
+              href="/privacy-policy"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms-of-service"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

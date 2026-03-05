@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'motion/react'
 import { experimental_useObject as useObject } from '@ai-sdk/react'
 import { Hero } from './Hero'
@@ -9,13 +10,19 @@ import { RecipeModal } from './RecipeModal'
 import { WeeklyPlanSchema } from '@/schemas/meal-plan'
 import type { Recipe } from './types'
 import { useAuth } from '@/contexts/user-context'
-import { getRemainingCount, getStoredPublicUserKeys, setStoredRemainingCount } from '@/lib/idb-keyval'
+import {
+  getRemainingCount,
+  getStoredPublicUserKeys,
+  setStoredRemainingCount,
+} from '@/lib/idb-keyval'
 import type { MealGenerationLimitsCheckResponseBody } from '../../../app/api/v1/generation-limits/route'
 
 export function MealPlannerApp() {
-  const { userId, isSignedIn } = useAuth();
-  const [remainingCount, setRemainingCount] = useState(() => isSignedIn ? 7 : 3);
-  const [triggerSavedPlan, setTriggerSavedPlan] = useState(false);
+  const { userId, isSignedIn } = useAuth()
+  const [remainingCount, setRemainingCount] = useState(() =>
+    isSignedIn ? 7 : 3,
+  )
+  const [triggerSavedPlan, setTriggerSavedPlan] = useState(false)
 
   const {
     object: data,
@@ -44,22 +51,21 @@ export function MealPlannerApp() {
         }
         setStoredRemainingCount(remainingCount)
         return remainingCount
-      });
+      })
     },
   })
 
   // Derive weeklyPlan from the streaming object
-  const weeklyPlan = data?.plan ?? [];
-  const weeklyPlanCompleted = weeklyPlan.length === 7;
+  const weeklyPlan = data?.plan ?? []
+  const weeklyPlanCompleted = weeklyPlan.length === 7
 
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleGenerate = useCallback(() => {
     if (remainingCount > 0) {
-      submit({})      
+      submit({})
     } else {
-      
     }
   }, [submit])
 
@@ -77,44 +83,48 @@ export function MealPlannerApp() {
   }, [])
 
   const loadRemainingCount = async () => {
-    const storedPublicUserKeys = await getStoredPublicUserKeys();
-    let count: number = 0;
+    const storedPublicUserKeys = await getStoredPublicUserKeys()
+    let count: number = 0
     if (isSignedIn) {
       if (storedPublicUserKeys === 0) {
         const res = await fetch('/api/v1/generation-limits', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, action: 'CHECK' }),
-        });
-        const data = await res.json() as MealGenerationLimitsCheckResponseBody;
-        count = data.remaining;
+        })
+        const data = (await res.json()) as MealGenerationLimitsCheckResponseBody
+        count = data.remaining
       } else {
-        count = await getRemainingCount();
+        count = await getRemainingCount()
         await fetch('/api/v1/generation-limits', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, action: 'SET_VALUE', remainingCount: count }),
-        });
+          body: JSON.stringify({
+            userId,
+            action: 'SET_VALUE',
+            remainingCount: count,
+          }),
+        })
       }
     } else {
-      count = await getRemainingCount();
+      count = await getRemainingCount()
     }
-    setRemainingCount(count);
+    setRemainingCount(count)
   }
 
   useEffect(() => {
-    loadRemainingCount();
-  }, []);
+    loadRemainingCount()
+  }, [])
 
   useEffect(() => {
     if (isSignedIn) {
-      loadRemainingCount();
+      loadRemainingCount()
     }
-  }, [isSignedIn]);
+  }, [isSignedIn])
 
   useEffect(() => {
     if (weeklyPlanCompleted) {
-      setTriggerSavedPlan(true);
+      setTriggerSavedPlan(true)
     }
   }, [weeklyPlanCompleted])
 
@@ -123,14 +133,18 @@ export function MealPlannerApp() {
       /**
        * @todo
        */
-      setTriggerSavedPlan(false);
+      setTriggerSavedPlan(false)
     }
   }, [triggerSavedPlan])
 
   return (
     <div className="min-h-screen bg-transparent">
       {/* Hero Section */}
-      <Hero count={remainingCount} onGenerate={handleGenerate} isGenerating={isLoading} />
+      <Hero
+        count={remainingCount}
+        onGenerate={handleGenerate}
+        isGenerating={isLoading}
+      />
 
       {/* Weekly Plan Section */}
       <AnimatePresence mode="wait">
@@ -191,10 +205,24 @@ export function MealPlannerApp() {
 
       {/* Footer */}
       <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="max-w-7xl mx-auto text-center space-y-4">
           <p className="text-sm text-muted-foreground">
             Made with ❤️ for food lovers everywhere
           </p>
+          <div className="flex justify-center gap-6 text-sm">
+            <Link
+              href="/privacy-policy"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms-of-service"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

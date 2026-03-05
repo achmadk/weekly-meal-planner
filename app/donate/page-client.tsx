@@ -33,7 +33,9 @@ export default function DonatePageClient() {
       {/* Donate Options */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className={`grid gap-6 mb-12 ${isLoaded && isSignedIn ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
+          <div
+            className={`grid gap-6 mb-12 ${isLoaded && isSignedIn ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}
+          >
             <div className="p-8 rounded-2xl border border-border bg-card text-center">
               <Coffee className="w-12 h-12 text-primary mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Buy us a coffee</h3>
@@ -150,10 +152,24 @@ export default function DonatePageClient() {
 
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="max-w-7xl mx-auto text-center space-y-4">
           <p className="text-sm text-muted-foreground">
             Made with ❤️ for food lovers everywhere
           </p>
+          <div className="flex justify-center gap-6 text-sm">
+            <Link
+              href="/privacy-policy"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms-of-service"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
