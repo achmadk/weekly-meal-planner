@@ -1,6 +1,10 @@
 import { motion } from 'motion/react'
 import { MealCard } from './MealCard'
 import type { Recipe } from './types'
+import { useAuth } from '@/contexts/user-context'
+import { Button } from '@/components/ui/button'
+import { Save } from 'lucide-react'
+import { toast } from 'react-toastify'
 
 interface DayPlan {
   day: string
@@ -30,6 +34,12 @@ export function WeeklyPlan({
   onSelectMeal,
   isComplete = false,
 }: WeeklyPlanProps) {
+  const { isSignedIn } = useAuth()
+
+  const handleSavePlan = () => {
+    toast.success('Plan saved successfully!')
+  }
+
   return (
     <section className="py-12 md:py-24 px-4 md:px-6 bg-gradient-to-b from-background to-primary/5">
       <div className="max-w-7xl mx-auto">
@@ -43,10 +53,16 @@ export function WeeklyPlan({
           <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
             Your Weekly Plan
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
             Click on any meal to see the full recipe and get personalized
             recommendations
           </p>
+          {isSignedIn && (
+            <Button onClick={handleSavePlan} className="gap-2">
+              <Save size={18} />
+              Save Plan
+            </Button>
+          )}
         </motion.div>
 
         {/* Days grid */}

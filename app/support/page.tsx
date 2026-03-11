@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Mail, MessageCircle, Github, BookOpen } from 'lucide-react'
 import { NavigationMenu } from '@/components/navigation/Menu'
+import { Footer } from '@/components/footer'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Support - Weekly Meal Planner',
@@ -136,27 +137,7 @@ export default function SupportPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Made with ❤️ for food lovers everywhere
-          </p>
-          <div className="flex justify-center gap-6 text-sm">
-            <Link
-              href="/privacy-policy"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/terms-of-service"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

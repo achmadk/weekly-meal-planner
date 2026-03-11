@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { Heart, Coffee, Utensils, Star } from 'lucide-react'
 import { NavigationMenu } from '@/components/navigation/Menu'
 import { useAuth } from '@/contexts/user-context'
+import { Footer } from '@/components/footer'
 
 export default function DonatePageClient() {
-  const { isSignedIn, isLoaded } = useAuth()
+  const { isSignedIn } = useAuth()
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -34,12 +35,12 @@ export default function DonatePageClient() {
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div
-            className={`grid gap-6 mb-12 ${isLoaded && isSignedIn ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}
+            className={`grid gap-6 mb-12 ${isSignedIn ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}
           >
             <div className="p-8 rounded-2xl border border-border bg-card text-center">
               <Coffee className="w-12 h-12 text-primary mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Buy us a coffee</h3>
-              <p className="text-muted-foreground mb-4">$5</p>
+              <p className="text-muted-foreground mb-4">IDR 85K</p>
               <p className="text-sm text-muted-foreground">
                 A small tip to fuel our late-night coding sessions
               </p>
@@ -51,13 +52,13 @@ export default function DonatePageClient() {
               </div>
               <Utensils className="w-12 h-12 text-primary mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Meal sponsor</h3>
-              <p className="text-muted-foreground mb-4">$15</p>
+              <p className="text-muted-foreground mb-4">IDR 250K</p>
               <p className="text-sm text-muted-foreground">
                 Help us keep the servers running for a month
               </p>
             </div>
 
-            {isLoaded && isSignedIn && (
+            {isSignedIn && (
               <div className="p-8 rounded-2xl border border-border bg-card text-center">
                 <Star className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">
@@ -151,27 +152,7 @@ export default function DonatePageClient() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Made with ❤️ for food lovers everywhere
-          </p>
-          <div className="flex justify-center gap-6 text-sm">
-            <Link
-              href="/privacy-policy"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/terms-of-service"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
