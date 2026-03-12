@@ -1,24 +1,28 @@
 'use client'
 
 import { createContext, useContext, ReactNode } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useClerk, useUser } from '@clerk/nextjs'
 
 interface UserContextType {
   isSignedIn: boolean
   user: any | null
   userId: string | null
+  signOut: () => Promise<void>
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const { isSignedIn: initialIsSignedIn = false, isLoaded, user } = useUser()
+  const clerk = useClerk()
 
   const userId = user?.id ?? null;
   const isSignedIn = isLoaded && initialIsSignedIn
 
+  const signOut = async () => await clerk.signOut()
+
   return (
-    <UserContext.Provider value={{ isSignedIn, user, userId }}>
+    <UserContext.Provider value={{ isSignedIn, user, userId, signOut }}>
       {children}
     </UserContext.Provider>
   )

@@ -1,10 +1,15 @@
+"use client"
+
 import { motion } from 'motion/react'
 import { MealCard } from './MealCard'
 import type { Recipe } from './types'
 import { useAuth } from '@/contexts/user-context'
 import { Button } from '@/components/ui/button'
-import { Save } from 'lucide-react'
+import { Save, Calendar } from 'lucide-react'
 import { toast } from 'react-toastify'
+import { useState } from 'react'
+import { DateRange } from 'react-day-picker'
+import { SavePlanModal } from './SavePlanModal'
 
 interface DayPlan {
   day: string
@@ -17,6 +22,7 @@ interface WeeklyPlanProps {
   plan: DayPlan[]
   onSelectMeal: (recipe: Recipe) => void
   isComplete?: boolean
+  isLoading?: boolean
 }
 
 const dayColors = [
@@ -33,11 +39,44 @@ export function WeeklyPlan({
   plan,
   onSelectMeal,
   isComplete = false,
+  isLoading = false,
 }: WeeklyPlanProps) {
   const { isSignedIn } = useAuth()
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [selectedDay, setSelectedDay] = useState<string | null>(null)
 
-  const handleSavePlan = () => {
-    toast.success('Plan saved successfully!')
+  const isLoadingAll = plan.length < 7
+
+  const handleSavePlanClick = () => {
+    setIsSaveModalOpen(true)
+  }
+
+  const handleCloseSavePlanModal = () => {
+    setSelectedDay(null)
+    setIsSaveModalOpen(false)
+  }
+
+  const handleSavePlanByDayClick = (dayName: string | null) => () => {
+    if (!dayName) {
+      return
+    }
+    setSelectedDay(dayName)
+    setIsSaveModalOpen(true)
+  }
+
+  const handleSavePlanSubmit = async (name: string, dateRange: Date | DateRange) => {
+    setIsSaving(true)
+    try {
+      console.log('Saving plan:', { name, dateRange })
+      toast.success('Plan saved successfully!')
+      setIsSaveModalOpen(false)
+    } catch (error) {
+      console.error('Failed to save plan:', error)
+      toast.error('Failed to save plan')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -58,18 +97,32 @@ export function WeeklyPlan({
             recommendations
           </p>
           {isSignedIn && (
-            <Button onClick={handleSavePlan} className="gap-2">
-              <Save size={18} />
-              Save Plan
-            </Button>
+            <div className="flex gap-2 justify-center">
+              <Button
+                onClick={handleSavePlanClick}
+                className="gap-2"
+                disabled={isLoadingAll}
+              >
+                <Save size={18} />
+                Save Plan
+              </Button>
+              <Button variant="outline" className="gap-2" disabled={isLoadingAll}>
+                <Calendar size={18} />
+                Add to Calendar
+              </Button>
+            </div>
           )}
         </motion.div>
 
         {/* Days grid */}
         <div className="space-y-10 md:space-y-16">
           {plan.map(
-            (dayPlan, dayIndex) =>
-              dayPlan && (
+            (dayPlan, dayIndex) => {
+              const mealCount = [dayPlan?.breakfast ?? null, dayPlan?.lunch ?? null, dayPlan?.dinner ?? null].filter(
+                (meal) => meal !== null
+              ).length ?? 0
+              const isLoadingEachDay = mealCount < 3
+              return dayPlan && (
                 <motion.div
                   key={dayPlan.day}
                   initial={{ opacity: 0, y: 40 }}
@@ -77,20 +130,45 @@ export function WeeklyPlan({
                   transition={{ duration: 0.6, delay: dayIndex * 0.1 }}
                 >
                   {/* Day header */}
-                  <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
-                    <div
-                      className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br ${dayColors[dayIndex]} flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg`}
-                    >
-                      {dayPlan?.day?.slice(0, 2) ?? '-'}
+                  <div className="flex items-center justify-between gap-3 md:gap-4 mb-6 md:mb-8">
+                    <div className="flex items-center gap-3 md:gap-4">
+                      <div
+                        className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br ${dayColors[dayIndex]} flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg`}
+                      >
+                        {dayPlan?.day?.slice(0, 2) ?? '-'}
+                      </div>
+                      <div>
+                        <h3 className="text-xl md:text-3xl font-bold text-foreground">
+                          {dayPlan?.day}
+                        </h3>
+                        <p className="text-xs md:text-sm text-muted-foreground font-medium">
+                          {`${mealCount} meals planned`}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xl md:text-3xl font-bold text-foreground">
-                        {dayPlan?.day}
-                      </h3>
-                      <p className="text-xs md:text-sm text-muted-foreground font-medium">
-                        3 meals planned
-                      </p>
-                    </div>
+                    {isSignedIn && (
+                      <div className="flex gap-1 md:gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1 md:gap-2 h-8 md:h-9 px-2 md:px-3"
+                          onClick={handleSavePlanByDayClick(dayPlan.day?.toLowerCase?.() ?? null)}
+                          disabled={isLoadingEachDay}
+                        >
+                          <Save size={14} className="md:size-[18px]" />
+                          <span className="hidden sm:inline">Save</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1 md:gap-2 h-8 md:h-9 px-2 md:px-3"
+                          disabled={isLoadingEachDay}
+                        >
+                          <Calendar size={14} className="md:size-[18px]" />
+                          <span className="hidden sm:inline">Calendar</span>
+                        </Button>
+                      </div>
+                    )}
                   </div>
 
                   {/* Meals grid */}
@@ -118,10 +196,20 @@ export function WeeklyPlan({
                     />
                   </div>
                 </motion.div>
-              ),
+              )
+            }
           )}
         </div>
       </div>
+
+      <SavePlanModal
+        isOpen={isSaveModalOpen}
+        onClose={handleCloseSavePlanModal}
+        onSave={handleSavePlanSubmit}
+        isSaving={isSaving}
+        mode={selectedDay ? "DAY_FULL" : "WEEK"}
+        {...{ selectedDay }}
+      />
     </section>
   )
 }

@@ -1,14 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { Heart, Coffee, Utensils, Star } from 'lucide-react'
+import { Heart } from 'lucide-react'
 import { NavigationMenu } from '@/components/navigation/Menu'
-import { useAuth } from '@/contexts/user-context'
 import { Footer } from '@/components/footer'
 
 export default function DonatePageClient() {
-  const { isSignedIn } = useAuth()
-
   return (
     <div className="min-h-screen bg-transparent">
       {/* Hero */}
@@ -34,60 +31,26 @@ export default function DonatePageClient() {
       {/* Donate Options */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
-          <div
-            className={`grid gap-6 mb-12 ${isSignedIn ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}
-          >
-            <div className="p-8 rounded-2xl border border-border bg-card text-center">
-              <Coffee className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Buy us a coffee</h3>
-              <p className="text-muted-foreground mb-4">IDR 85K</p>
-              <p className="text-sm text-muted-foreground">
-                A small tip to fuel our late-night coding sessions
-              </p>
-            </div>
-
-            <div className="p-8 rounded-2xl border-2 border-primary bg-card text-center relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-medium rounded-full">
-                Popular
-              </div>
-              <Utensils className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Meal sponsor</h3>
-              <p className="text-muted-foreground mb-4">IDR 250K</p>
-              <p className="text-sm text-muted-foreground">
-                Help us keep the servers running for a month
-              </p>
-            </div>
-
-            {isSignedIn && (
-              <div className="p-8 rounded-2xl border border-border bg-card text-center">
-                <Star className="w-12 h-12 text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">
-                  Premium supporter
-                </h3>
-                <p className="text-muted-foreground mb-4">$30</p>
-                <p className="text-sm text-muted-foreground">
-                  Get exclusive features and early access to new tools
-                </p>
-              </div>
-            )}
+          <div className="text-center mb-8">
+            <p className="text-xl text-muted-foreground">
+              You can donate to us starts from{' '}
+              <span className="text-2xl font-bold text-primary">IDR 20K</span>
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Every donation helps keep this service free for everyone
+            </p>
           </div>
 
           <div className="text-center">
             <Link
-              href="https://ko-fi.com/weeklymealplanner"
+              href="https://trakteer.id/achmad-kurnianto-rxbtv/tip"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <button className="px-8 py-4 bg-[#29ade0] text-white font-semibold rounded-xl hover:bg-[#1e9ace] transition-colors text-lg">
-                Donate via Ko-fi
+              <button className="px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-xl hover:opacity-90 transition-opacity text-lg cursor-pointer">
+                Donate
               </button>
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
-              We also accept Bitcoin:{' '}
-              <code className="bg-muted px-2 py-1 rounded">
-                bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
-              </code>
-            </p>
           </div>
         </div>
       </section>

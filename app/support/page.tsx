@@ -34,10 +34,10 @@ export default function SupportPage() {
       </section>
 
       {/* Support Options */}
-      <section className="py-24 px-6">
+      <section id="contact" className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
-            <Link href="mailto:support@weeklymealplanner.app" className="block">
+            <Link href="mailto:me@achmadk.com" className="block">
               <div className="p-8 rounded-2xl border border-border bg-card hover:bg-accent/50 transition-colors cursor-pointer">
                 <Mail className="w-12 h-12 text-primary mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Email Support</h3>
@@ -48,7 +48,7 @@ export default function SupportPage() {
               </div>
             </Link>
 
-            <Link
+            {/* <Link
               href="https://discord.gg/weeklymealplanner"
               target="_blank"
               rel="noopener noreferrer"
@@ -61,7 +61,7 @@ export default function SupportPage() {
                   Connect with our community on Discord for real-time support.
                 </p>
               </div>
-            </Link>
+            </Link> */}
 
             <Link
               href="https://github.com/achmadk/weekly-meal-planner/issues"
@@ -78,7 +78,7 @@ export default function SupportPage() {
               </div>
             </Link>
 
-            <Link
+            {/* <Link
               href="https://docs.weeklymealplanner.app"
               target="_blank"
               rel="noopener noreferrer"
@@ -91,13 +91,13 @@ export default function SupportPage() {
                   Check our docs for guides, tutorials, and FAQs.
                 </p>
               </div>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 px-6 border-t border-border">
+      <section id="faq" className="py-24 px-6 border-t border-border">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">
             Frequently Asked Questions

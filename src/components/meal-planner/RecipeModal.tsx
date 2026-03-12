@@ -10,6 +10,7 @@ import {
   Sparkles,
   Bookmark,
   BookOpen,
+  Calendar,
 } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { Recipe } from './types'
@@ -138,9 +139,42 @@ export function RecipeModal({
                     <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-3">
                       {recipe.title}
                     </h2>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
+                    <p className="text-lg text-muted-foreground leading-relaxed mb-4">
                       {recipe.description}
                     </p>
+                    {isSignedIn && (
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={handleSave}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer"
+                          title={isSaved ? 'Remove from saved' : 'Save recipe'}
+                        >
+                          <Bookmark
+                            size={18}
+                            className={
+                              isSaved
+                                ? 'fill-current text-yellow-500'
+                                : 'text-primary'
+                            }
+                          />
+                          <span className="font-semibold text-primary text-sm">
+                            {isSaved ? 'Saved' : 'Save Recipe'}
+                          </span>
+                        </button>
+                        <button
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/20 hover:bg-secondary/30 transition-colors cursor-pointer"
+                          title="Add to calendar"
+                        >
+                          <Calendar
+                            size={18}
+                            className="text-secondary-foreground"
+                          />
+                          <span className="font-semibold text-secondary-foreground text-sm">
+                            Add to Calendar
+                          </span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* Stats */}
@@ -190,25 +224,6 @@ export function RecipeModal({
                       </span>
                       <span className="text-primary/70">per serving</span>
                     </div>
-                    {isSignedIn && (
-                      <button
-                        onClick={handleSave}
-                        className="p-2 inline-flex items-center gap-2 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer"
-                        title={isSaved ? 'Remove from saved' : 'Save recipe'}
-                      >
-                        <Bookmark
-                          size={20}
-                          className={
-                            isSaved
-                              ? 'ml-2 fill-current text-yellow-500'
-                              : 'text-primary'
-                          }
-                        />
-                        <span className="font-semibold text-primary mr-2">
-                          {isSaved ? 'Remove from saved' : 'Save recipe'}
-                        </span>
-                      </button>
-                    )}
                   </div>
 
                   {/* Tags */}

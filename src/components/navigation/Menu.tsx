@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { useAuth } from '@/contexts/user-context'
 
@@ -12,9 +13,59 @@ const navLinks = [
 
 const dashboardLink = { href: '/dashboard', label: 'Dashboard' }
 
+function NavLink({
+  href,
+  children,
+  isActive,
+}: {
+  href: string
+  children: React.ReactNode
+  isActive: boolean
+}) {
+  return (
+    <Link
+      href={href}
+      className={`text-sm font-medium transition-colors ${
+        isActive
+          ? 'text-foreground'
+          : 'text-muted-foreground hover:text-foreground'
+      }`}
+    >
+      {children}
+    </Link>
+  )
+}
+
+function MobileNavLink({
+  href,
+  children,
+  isActive,
+  onClick,
+}: {
+  href: string
+  children: React.ReactNode
+  isActive: boolean
+  onClick: () => void
+}) {
+  return (
+    <Link
+      href={href}
+      className={`block px-4 py-2 text-sm font-medium transition-colors ${
+        isActive
+          ? 'text-foreground bg-muted/50'
+          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+      }`}
+      onClick={onClick}
+    >
+      {children}
+    </Link>
+  )
+}
+
 export function NavigationMenu() {
   const [isOpen, setIsOpen] = useState(false)
   const { isSignedIn } = useAuth()
+  const pathname = usePathname()
 
   const toggleOpen = () =>
     setIsOpen((isOpen) => {
@@ -36,55 +87,66 @@ export function NavigationMenu() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-4">
           {isSignedIn && (
-            <Link
+            <NavLink
               href={dashboardLink.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              isActive={pathname === dashboardLink.href}
             >
               {dashboardLink.label}
-            </Link>
+            </NavLink>
           )}
           {navLinks.map((link) => (
-            <Link
+            <NavLink
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              isActive={pathname === link.href}
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
 
-        {/* Mobile Hamburger Button */}
-        <button
-          className="md:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors"
-          onClick={toggleOpen}
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {/* Mobile Hamburger Button - hidden when menu is open */}
+        {!isOpen && (
+          <button
+            className="md:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors"
+            onClick={toggleOpen}
+            aria-label="Toggle menu"
+          >
+            <Menu size={20} />
+          </button>
+        )}
       </div>
 
       {/* Mobile Menu Dropdown */}
       {isOpen && (
         <div className="absolute top-full left-0 mt-2 w-40 bg-background border border-border rounded-lg shadow-lg py-2 md:hidden">
+          <div className="flex justify-end px-2">
+            <button
+              className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+              onClick={toggleOpen}
+              aria-label="Close menu"
+            >
+              <X size={20} />
+            </button>
+          </div>
           {isSignedIn && (
-            <Link
+            <MobileNavLink
               href={dashboardLink.href}
-              className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              isActive={pathname === dashboardLink.href}
               onClick={toggleOpen}
             >
               {dashboardLink.label}
-            </Link>
+            </MobileNavLink>
           )}
           {navLinks.map((link) => (
-            <Link
+            <MobileNavLink
               key={link.href}
               href={link.href}
-              className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              isActive={pathname === link.href}
               onClick={toggleOpen}
             >
               {link.label}
-            </Link>
+            </MobileNavLink>
           ))}
         </div>
       )}

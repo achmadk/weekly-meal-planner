@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, TargetAndTransition } from 'motion/react'
-import { Clock, Users, Flame, Bookmark, Image } from 'lucide-react'
+import { Clock, Users, Flame, Bookmark, Image, Calendar } from 'lucide-react'
 import type { Recipe, MealType } from './types'
 import { useRecipeImage } from '@/hooks/useRecipeImage'
 import { useAuth } from '@/contexts/user-context'
@@ -159,20 +159,28 @@ export function MealCard({
               {recipe.title}
             </h3>
             {isSignedIn && (
-              <button
-                onClick={handleSave}
-                className="flex-shrink-0 w-12 h-12 rounded-full cursor-pointer bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
-                title={isSaved ? 'Remove from saved' : 'Save recipe'}
-              >
-                <Bookmark
-                  size={20}
-                  className={
-                    isSaved
-                      ? 'fill-current text-yellow-500'
-                      : 'text-muted-foreground'
-                  }
-                />
-              </button>
+              <div className="flex gap-1">
+                <button
+                  onClick={handleSave}
+                  className="flex-shrink-0 w-10 h-10 rounded-full cursor-pointer bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+                  title={isSaved ? 'Remove from saved' : 'Save recipe'}
+                >
+                  <Bookmark
+                    size={18}
+                    className={
+                      isSaved
+                        ? 'fill-current text-yellow-500'
+                        : 'text-muted-foreground'
+                    }
+                  />
+                </button>
+                <button
+                  className="flex-shrink-0 w-10 h-10 rounded-full cursor-pointer bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+                  title="Add to calendar"
+                >
+                  <Calendar size={18} className="text-muted-foreground" />
+                </button>
+              </div>
             )}
           </div>
 
