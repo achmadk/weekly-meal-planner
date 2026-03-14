@@ -5,7 +5,19 @@ import {
   timestamp,
   text,
   integer,
+  boolean,
 } from 'drizzle-orm/pg-core'
+
+export const userBookmarks = pgTable('user_bookmarks', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  recipeId: varchar('recipe_id', { length: 255 }).notNull(),
+  isBookmarked: boolean('is_bookmarked').notNull().default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
+})
 
 export const mealPlans = pgTable('meal_plans', {
   id: serial('id').primaryKey(),

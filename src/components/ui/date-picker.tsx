@@ -83,7 +83,7 @@ export function DatePickerWithRange({
           )}
           disabled={disabled}
         >
-          <CalendarDays className="mr-2 h-4 w-4" />
+          {/* <CalendarDays className="mr-2 h-4 w-4" /> */}
           {date?.from ? (
             date.to ? (
               <>

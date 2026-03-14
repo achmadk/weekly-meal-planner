@@ -15,6 +15,7 @@ import {
   getRemainingCount,
   getStoredPublicUserKeys,
   setStoredRemainingCount,
+  setGeneratedRecipes,
 } from '@/lib/idb-keyval'
 import type { MealGenerationLimitsCheckResponseBody } from '../../../app/api/v1/generation-limits/route'
 
@@ -24,15 +25,17 @@ export function MealPlannerApp() {
     isSignedIn ? 7 : 3,
   )
   const [triggerSavedPlan, setTriggerSavedPlan] = useState(false)
+  const [isLoadingAction, setIsLoadingAction] = useState(false)
 
   const {
     object: data,
     submit,
-    isLoading,
+    isLoading: isLoadingFetch,
   } = useObject({
     api: '/api/v1/meal-generators',
     schema: WeeklyPlanSchema,
-    onFinish: async () => {
+    onFinish: async ({ object }) => {
+      await saveGeneratedRecipes(object?.plan ?? [])
       setRemainingCount((prev) => {
         const remainingCount = prev - 1
         if (isSignedIn) {
@@ -59,6 +62,51 @@ export function MealPlannerApp() {
   // Derive weeklyPlan from the streaming object
   const weeklyPlan = data?.plan ?? []
   const weeklyPlanCompleted = weeklyPlan.length === 7
+
+  const saveGeneratedRecipes = async (plan: typeof weeklyPlan = []) => {
+    const recipes: Recipe[] = []
+    for (const dayPlan of plan) {
+      if (!dayPlan) continue
+      const { breakfast, lunch, dinner } = dayPlan
+      if (breakfast)
+        recipes.push({
+          ...breakfast,
+          imageUrl: breakfast.image ?? '',
+        } as Recipe)
+      if (lunch)
+        recipes.push({ ...lunch, imageUrl: lunch.image ?? '' } as Recipe)
+      if (dinner)
+        recipes.push({ ...dinner, imageUrl: dinner.image ?? '' } as Recipe)
+    }
+    await setGeneratedRecipes(recipes)
+    return recipes
+  }
+
+  // Transform weekly plan into all recipes (flatten all meals from all days)
+  // const allRecipes: Recipe[] = (() => {
+  //   const recipes: Recipe[] = []
+  //   for (const dayPlan of weeklyPlan) {
+  //     if (!dayPlan) continue
+  //     const { breakfast, lunch, dinner } = dayPlan
+  //     if (breakfast)
+  //       recipes.push({
+  //         ...breakfast,
+  //         imageUrl: breakfast.image ?? '',
+  //       } as Recipe)
+  //     if (lunch)
+  //       recipes.push({ ...lunch, imageUrl: lunch.image ?? '' } as Recipe)
+  //     if (dinner)
+  //       recipes.push({ ...dinner, imageUrl: dinner.image ?? '' } as Recipe)
+  //   }
+  //   return recipes
+  // })()
+
+  // Save recipes to IndexedDB when plan is complete
+  // useEffect(() => {
+  //   if (weeklyPlanCompleted && allRecipes.length > 0) {
+  //     setGeneratedRecipes(allRecipes)
+  //   }
+  // }, [weeklyPlanCompleted, allRecipes])
 
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -113,6 +161,31 @@ export function MealPlannerApp() {
     setRemainingCount(count)
   }
 
+  const handleMealBookmarked = async (recipe: Recipe, isBookmarked = true) => {
+    setIsLoadingAction(true)
+    try {
+      console.log(recipe)
+      const recipeId = recipe?.id?.toString() ?? ''
+      const response = await fetch('/api/v1/bookmarks', {
+        method: 'POST',
+        // @ts-expect-error
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId,
+        },
+        body: JSON.stringify({ recipeId, isBookmarked }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update bookmark')
+      }
+    } catch (error) {
+      console.error('Bookmark error:', error)
+    } finally {
+      setIsLoadingAction(false)
+    }
+  }
+
   useEffect(() => {
     loadRemainingCount()
   }, [])
@@ -144,7 +217,7 @@ export function MealPlannerApp() {
       <Hero
         count={remainingCount}
         onGenerate={handleGenerate}
-        isGenerating={isLoading}
+        isGenerating={isLoadingFetch}
       />
 
       {/* Weekly Plan Section */}
@@ -161,14 +234,16 @@ export function MealPlannerApp() {
               // @ts-ignore - Types might mismatch slightly during streaming partials but acceptable for UI rendering
               plan={weeklyPlan}
               onSelectMeal={handleSelectMeal}
+              onMealBookmarked={handleMealBookmarked}
               isComplete={weeklyPlan.length === 7}
+              isLoading={isLoadingAction || isLoadingFetch}
             />
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Empty state when no plan generated */}
-      {!weeklyPlan && !isLoading && (
+      {!weeklyPlan && !isLoadingFetch && (
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

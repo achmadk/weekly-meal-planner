@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { motion } from 'motion/react'
 import { MealCard } from './MealCard'
@@ -10,6 +10,7 @@ import { toast } from 'react-toastify'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import { SavePlanModal } from './SavePlanModal'
+import { updateGeneratedRecipeItem } from '@/lib/idb-keyval'
 
 interface DayPlan {
   day: string
@@ -23,6 +24,7 @@ interface WeeklyPlanProps {
   onSelectMeal: (recipe: Recipe) => void
   isComplete?: boolean
   isLoading?: boolean
+  onMealBookmarked?: ((recipe: Recipe, isBookmarked?: boolean) => Promise<void>) | null
 }
 
 const dayColors = [
@@ -40,6 +42,7 @@ export function WeeklyPlan({
   onSelectMeal,
   isComplete = false,
   isLoading = false,
+  onMealBookmarked = null,
 }: WeeklyPlanProps) {
   const { isSignedIn } = useAuth()
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false)
@@ -65,7 +68,10 @@ export function WeeklyPlan({
     setIsSaveModalOpen(true)
   }
 
-  const handleSavePlanSubmit = async (name: string, dateRange: Date | DateRange) => {
+  const handleSavePlanSubmit = async (
+    name: string,
+    dateRange: Date | DateRange,
+  ) => {
     setIsSaving(true)
     try {
       console.log('Saving plan:', { name, dateRange })
@@ -78,6 +84,9 @@ export function WeeklyPlan({
       setIsSaving(false)
     }
   }
+
+  const onLoadComplete = async (recipe: Recipe) =>
+    await updateGeneratedRecipeItem(recipe)
 
   return (
     <section className="py-12 md:py-24 px-4 md:px-6 bg-gradient-to-b from-background to-primary/5">
@@ -106,23 +115,32 @@ export function WeeklyPlan({
                 <Save size={18} />
                 Save Plan
               </Button>
-              <Button variant="outline" className="gap-2" disabled={isLoadingAll}>
-                <Calendar size={18} />
-                Add to Calendar
-              </Button>
             </div>
           )}
         </motion.div>
 
         {/* Days grid */}
         <div className="space-y-10 md:space-y-16">
-          {plan.map(
-            (dayPlan, dayIndex) => {
-              const mealCount = [dayPlan?.breakfast ?? null, dayPlan?.lunch ?? null, dayPlan?.dinner ?? null].filter(
-                (meal) => meal !== null
+          {plan.map((dayPlan, dayIndex) => {
+            const mealCount =
+              [
+                dayPlan?.breakfast ?? null,
+                dayPlan?.lunch ?? null,
+                dayPlan?.dinner ?? null,
+              ].filter(
+                (meal) => meal !== null && Object.keys(meal).length === 12,
               ).length ?? 0
-              const isLoadingEachDay = mealCount < 3
-              return dayPlan && (
+            const isLoadingEachDay = mealCount < 3
+            const sharedMealCardProps = {
+              onClick: onSelectMeal,
+              isComplete,
+              onLoadComplete,
+              onRecipeBookmarked: onMealBookmarked,
+              disabled: isLoading
+            }
+
+            return (
+              dayPlan && (
                 <motion.div
                   key={dayPlan.day}
                   initial={{ opacity: 0, y: 40 }}
@@ -142,7 +160,7 @@ export function WeeklyPlan({
                           {dayPlan?.day}
                         </h3>
                         <p className="text-xs md:text-sm text-muted-foreground font-medium">
-                          {`${mealCount} meals planned`}
+                          {`${mealCount !== 3 ? `${mealCount} / 3` : mealCount} meals planned`}
                         </p>
                       </div>
                     </div>
@@ -152,20 +170,13 @@ export function WeeklyPlan({
                           variant="ghost"
                           size="sm"
                           className="gap-1 md:gap-2 h-8 md:h-9 px-2 md:px-3"
-                          onClick={handleSavePlanByDayClick(dayPlan.day?.toLowerCase?.() ?? null)}
+                          onClick={handleSavePlanByDayClick(
+                            dayPlan.day?.toLowerCase?.() ?? null,
+                          )}
                           disabled={isLoadingEachDay}
                         >
                           <Save size={14} className="md:size-[18px]" />
-                          <span className="hidden sm:inline">Save</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="gap-1 md:gap-2 h-8 md:h-9 px-2 md:px-3"
-                          disabled={isLoadingEachDay}
-                        >
-                          <Calendar size={14} className="md:size-[18px]" />
-                          <span className="hidden sm:inline">Calendar</span>
+                          <span className="hidden sm:inline">Save Plan</span>
                         </Button>
                       </div>
                     )}
@@ -176,29 +187,26 @@ export function WeeklyPlan({
                     <MealCard
                       recipe={dayPlan.breakfast}
                       mealType="breakfast"
-                      onClick={(recipe: Recipe) => onSelectMeal(recipe)}
                       delay={dayIndex * 0.1 + 0.1}
-                      {...{ isComplete }}
+                      {...sharedMealCardProps}
                     />
                     <MealCard
                       recipe={dayPlan.lunch}
                       mealType="lunch"
-                      onClick={(recipe: Recipe) => onSelectMeal(recipe)}
                       delay={dayIndex * 0.1 + 0.15}
-                      {...{ isComplete }}
+                      {...sharedMealCardProps}
                     />
                     <MealCard
                       recipe={dayPlan.dinner}
                       mealType="dinner"
-                      onClick={(recipe: Recipe) => onSelectMeal(recipe)}
                       delay={dayIndex * 0.1 + 0.2}
-                      {...{ isComplete }}
+                      {...sharedMealCardProps}
                     />
                   </div>
                 </motion.div>
               )
-            }
-          )}
+            )
+          })}
         </div>
       </div>
 
@@ -207,7 +215,8 @@ export function WeeklyPlan({
         onClose={handleCloseSavePlanModal}
         onSave={handleSavePlanSubmit}
         isSaving={isSaving}
-        mode={selectedDay ? "DAY_FULL" : "WEEK"}
+        mode={selectedDay ? 'DAY_FULL' : 'WEEK'}
+        mealPlanTitle="Weekly Meal Plan"
         {...{ selectedDay }}
       />
     </section>

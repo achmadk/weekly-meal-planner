@@ -1,11 +1,19 @@
 'use client'
 
 import { motion, TargetAndTransition } from 'motion/react'
-import { Clock, Users, Flame, Bookmark, Image, Calendar } from 'lucide-react'
+import {
+  Clock,
+  Users,
+  Flame,
+  Bookmark,
+  Image,
+  Calendar,
+  Save,
+} from 'lucide-react'
 import type { Recipe, MealType } from './types'
 import { useRecipeImage } from '@/hooks/useRecipeImage'
 import { useAuth } from '@/contexts/user-context'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface MealCardProps {
   recipe: Recipe
@@ -13,6 +21,9 @@ interface MealCardProps {
   onClick: (recipe: Recipe) => void
   delay?: number
   isComplete?: boolean
+  onLoadComplete?: ((recipe: Recipe) => Promise<void>) | null
+  onRecipeBookmarked?: ((recipe: Recipe, isBookmarked?: boolean) => Promise<void>) | null
+  disabled?: boolean
 }
 
 const mealTypeConfig = {
@@ -42,21 +53,41 @@ export function MealCard({
   onClick,
   delay = 0,
   isComplete = false,
+  onLoadComplete = null,
+  onRecipeBookmarked = null,
+  disabled = false,
 }: MealCardProps) {
   const config = mealTypeConfig[mealType]
   const recipeDataIsCompleted = recipe && Object.keys(recipe).length === 12
   const { isSignedIn } = useAuth()
   const [isSaved, setIsSaved] = useState(false)
+  const [recipeData, setRecipeData] = useState<Recipe | null>(null)
 
   const { imageUrl, attribution } = useRecipeImage(
     recipe,
     isComplete && recipeDataIsCompleted,
   )
 
-  const handleSave = (e: React.MouseEvent) => {
+  const handleBookmarkRecipe = (e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation()
-    setIsSaved((prev) => !prev)
+    setIsSaved((prev) => {
+      const newValue = !prev
+      console.log(recipeData)
+      onRecipeBookmarked?.(recipeData ?? recipe, newValue)
+      return newValue
+    })
   }
+
+  useEffect(() => {
+    if (isComplete && recipeDataIsCompleted && [imageUrl, attribution].every((val) => val !== null)) {
+      setRecipeData(() => {
+        const newValue = { ...recipe, imageUrl, attribution } as Recipe
+        onLoadComplete?.(newValue)
+        return newValue
+      })
+    }
+  }, [isComplete, recipeDataIsCompleted,imageUrl, attribution])
 
   if (!recipeDataIsCompleted) {
     return (
@@ -92,8 +123,8 @@ export function MealCard({
       whileHover={
         { y: -8, transition: { duration: 0.2 } } as TargetAndTransition
       }
-      onClick={() => onClick(currentRecipe)}
-      className="group cursor-pointer"
+      onClick={() => !disabled && onClick(currentRecipe)}
+      className={`group ${disabled ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
     >
       <div className="relative bg-white rounded-2xl overflow-hidden shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-black/10 transition-all duration-300 border border-gray-100">
         {/* Image */}
@@ -161,9 +192,15 @@ export function MealCard({
             {isSignedIn && (
               <div className="flex gap-1">
                 <button
-                  onClick={handleSave}
                   className="flex-shrink-0 w-10 h-10 rounded-full cursor-pointer bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
-                  title={isSaved ? 'Remove from saved' : 'Save recipe'}
+                  title="Save plan"
+                >
+                  <Save size={18} className="text-muted-foreground" />
+                </button>
+                <button
+                  onClick={handleBookmarkRecipe}
+                  className="flex-shrink-0 w-10 h-10 rounded-full cursor-pointer bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+                  title={isSaved ? 'Remove from bookmarked' : 'Bookmark recipe'}
                 >
                   <Bookmark
                     size={18}
@@ -173,12 +210,6 @@ export function MealCard({
                         : 'text-muted-foreground'
                     }
                   />
-                </button>
-                <button
-                  className="flex-shrink-0 w-10 h-10 rounded-full cursor-pointer bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
-                  title="Add to calendar"
-                >
-                  <Calendar size={18} className="text-muted-foreground" />
                 </button>
               </div>
             )}
@@ -192,7 +223,7 @@ export function MealCard({
           <div className="flex items-center gap-4 text-xs text-[#3D405B]/50">
             <span className="flex items-center gap-1">
               <Clock size={12} />
-              {`${recipe.prepTime}${recipe.cookTime !== 0 ? ` + ${recipe.cookTime}` : ''}`}
+              {`${recipe.prepTime}${recipe.cookTime !== 0 ? ` + ${recipe.cookTime}` : ''} minutes`}
             </span>
             <span className="flex items-center gap-1">
               <Users size={12} />

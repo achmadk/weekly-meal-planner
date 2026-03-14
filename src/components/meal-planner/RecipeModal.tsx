@@ -11,6 +11,7 @@ import {
   Bookmark,
   BookOpen,
   Calendar,
+  Save,
 } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { Recipe } from './types'
@@ -46,7 +47,7 @@ export function RecipeModal({
   const mealConfig = mealTypeLabels[recipe.mealType]
 
   const handleSave = () => {
-    setIsSaved(!isSaved)
+    setIsSaved(prev => !prev)
   }
 
   return (
@@ -147,7 +148,7 @@ export function RecipeModal({
                         <button
                           onClick={handleSave}
                           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer"
-                          title={isSaved ? 'Remove from saved' : 'Save recipe'}
+                          title={isSaved ? 'Remove from bookmarked' : 'Bookmark recipe'}
                         >
                           <Bookmark
                             size={18}
@@ -158,19 +159,19 @@ export function RecipeModal({
                             }
                           />
                           <span className="font-semibold text-primary text-sm">
-                            {isSaved ? 'Saved' : 'Save Recipe'}
+                            {isSaved ? 'Bookmarked' : 'Bookmark Recipe'}
                           </span>
                         </button>
                         <button
                           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/20 hover:bg-secondary/30 transition-colors cursor-pointer"
-                          title="Add to calendar"
+                          title="Save Plan"
                         >
-                          <Calendar
+                          <Save
                             size={18}
                             className="text-secondary-foreground"
                           />
                           <span className="font-semibold text-secondary-foreground text-sm">
-                            Add to Calendar
+                            Save Plan
                           </span>
                         </button>
                       </div>

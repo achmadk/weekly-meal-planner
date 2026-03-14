@@ -21,10 +21,10 @@ export function useRecipeImage<
         try {
             const response = await fetch(`/api/v1/images?query=${recipe.description}`);
             const data = await response.json() as Result;
-            setImageUrl(data.url);
+            setImageUrl(data?.url ?? null);
             setAttribution({
-                imgName: data.author.name,
-                imgLink: data.author.link,
+                imgName: data?.author?.name ?? null,
+                imgLink: data?.author?.link ?? null,
                 providerLink: "https://unsplash.com/?utm_source=weekly_meal_planner&utm_medium=referral",
             });
         } finally {
