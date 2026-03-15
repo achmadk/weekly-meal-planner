@@ -25,8 +25,8 @@ const openAI = createOpenAI({
 //   // }
 // })
 
-// export const model = openAI.responses("gpt-4o-mini")
-export const model = openAI("gpt-4.1")
+export const model = openAI("gpt-4.1-mini")
+// export const model = openAI("gpt-4.1")
 
 // Define the meal planning agent
 export const mealAgent = new Agent({
