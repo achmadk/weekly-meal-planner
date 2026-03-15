@@ -1,3 +1,5 @@
+// import { withSerwist } from '@serwist/turbopack'
+
 const deploymentMode = process.env.DEPLOYMENT_MODE ?? 'local'
 
 if (deploymentMode === 'cloudflare') {
