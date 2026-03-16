@@ -1,17 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { MouseEvent, useRef, useState } from 'react'
 import { DateRange } from 'react-day-picker'
-import { format, addDays } from 'date-fns'
-import {
-  Save,
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  Check,
-} from 'lucide-react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { addDays } from 'date-fns'
+import { Save, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
+import { Form, Formik, FormikProps, useFormikContext } from 'formik'
 import * as yup from 'yup'
 
 import { cn } from '@/lib/utils'
@@ -39,18 +32,273 @@ interface SavePlanModalProps {
   mealPlanTitle?: string
 }
 
-const schema = yup.object().shape({
-  planName: yup.string().required('Please enter a plan name'),
-  dateInput: yup
-    .mixed<Date | DateRange>()
-    .test('has-date', 'Please select schedule day(s)', (value) => {
-      if (!value) return false
-      if (value instanceof Date) return true
-      return [value.from, value.to].every((date) => date instanceof Date)
-    }),
-})
+type FormData = {
+  planName: string
+  dateInput: Date | DateRange | undefined
+  addToCalendar: boolean
+}
 
-type FormData = yup.InferType<typeof schema>
+function SavePlanFormContent({
+  step,
+  setStep,
+  mode,
+  isSaving,
+  onClose,
+}: {
+  step: number
+  setStep: (step: number) => void
+  mode: SavePlanModalProps['mode']
+  isSaving: boolean
+  onClose: () => void
+}) {
+  const {
+    getFieldProps,
+    touched,
+    setTouched,
+    errors,
+    values,
+    setFieldValue,
+    isValid,
+  } = useFormikContext<FormData>()
+
+  const isDateSelected =
+    mode === 'WEEK'
+      ? values.dateInput &&
+        !(values.dateInput instanceof Date) &&
+        values.dateInput?.from &&
+        values.dateInput?.to
+      : values.dateInput instanceof Date
+
+  const handleNext = (e: MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setTouched({
+      ...touched,
+      planName: true,
+      dateInput: true,
+    })
+    if (values.planName && values.dateInput) {
+      setStep(2)
+    }
+  }
+
+  const handleBack = () => {
+    setStep(1)
+  }
+
+  const handleCalendarAppClick = (app: (typeof calendarApps)[0]) => {
+    // if (!values.dateInput) return
+    // let startDate: Date
+    // let endDate: Date
+    // if (values.dateInput instanceof Date) {
+    //   startDate = values.dateInput
+    //   endDate = values.dateInput
+    // } else {
+    //   startDate = values.dateInput.from!
+    //   endDate = values.dateInput.to!
+    // }
+    // const url = app.generateUrl(title, startDate, endDate)
+    // if (app.id === 'apple') {
+    //   const link = document.createElement('a')
+    //   link.href = url
+    //   link.download = `${title.replace(/\s+/g, '_')}.ics`
+    //   link.click()
+    //   URL.revokeObjectURL(url)
+    // } else {
+    //   window.open(url, '_blank')
+    // }
+  }
+
+  console.log(errors.dateInput)
+
+  return (
+    <Form>
+      <>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {step === 1 ? (
+              <Save className="w-5 h-5" />
+            ) : (
+              <Calendar className="w-5 h-5" />
+            )}
+            {step === 1 ? 'Save Meal Plan' : 'Add to Calendar'}
+          </DialogTitle>
+          <DialogDescription>
+            {step === 1 &&
+              'Give your meal plan a name and select the schedule days.'}
+          </DialogDescription>
+        </DialogHeader>
+
+        {step === 1 && (
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="plan-name">
+                Plan Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="plan-name"
+                placeholder="e.g., Week 1 - Healthy Start"
+                {...getFieldProps('planName')}
+              />
+              <p className={cn("text-sm text-destructive", !(touched.planName && errors.planName) && "h-5")}>
+                {touched.planName && errors.planName ? errors.planName : " "}
+              </p>
+            </div>
+
+            <div className="grid gap-2">
+              <Label className="flex items-center gap-2">
+                Schedule day(s) <span className="text-destructive">*</span>
+              </Label>
+              {mode === 'WEEK' ? (
+                <>
+                  <DatePickerWithRange
+                    date={values.dateInput as DateRange | undefined}
+                    onDateChange={(date) => setFieldValue('dateInput', date)}
+                    className={
+                      errors.dateInput && touched.dateInput
+                        ? 'border-destructive'
+                        : ''
+                    }
+                    onReset={() => setFieldValue('dateInput', undefined)}
+                  />
+                  {/** @ts-expect-error */}
+                  <p className={cn("text-sm text-destructive", (errors?.dateInput as DateRange)?.from && "h-5")}>
+                    {/** @ts-expect-error */}
+                    {errors?.dateInput?.from ?? " "}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <DatePicker
+                    date={values.dateInput as Date | undefined}
+                    onDateChange={(date) => setFieldValue('dateInput', date)}
+                    className={
+                      errors.dateInput && touched.dateInput
+                        ? 'border-destructive'
+                        : ''
+                    }
+                    onReset={() => setFieldValue('dateInput', undefined)}
+                  />
+                  <p className="text-sm text-destructive">
+                    {touched.dateInput && errors.dateInput ? errors.dateInput as string : " "}
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="grid gap-4 py-4">
+            <div className="flex items-center gap-2" tab-index={0}>
+              <Checkbox
+                id="add-to-calendar"
+                checked={values.addToCalendar}
+                onCheckedChange={(checked) =>
+                  setFieldValue('addToCalendar', checked)
+                }
+              />
+              <Label
+                htmlFor="add-to-calendar"
+                className="text-sm font-normal cursor-pointer"
+              >
+                Use existing calendar app
+              </Label>
+            </div>
+
+            <div className="grid gap-2">
+              <div className="flex flex-wrap gap-2">
+                {calendarApps.map((app) => (
+                  <Button
+                    key={app.id}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      'gap-2',
+                      app.color,
+                      !values.addToCalendar &&
+                        isDateSelected &&
+                        'opacity-50 cursor-not-allowed',
+                    )}
+                    disabled={!values.addToCalendar || !isDateSelected}
+                    onClick={() => handleCalendarAppClick(app)}
+                  >
+                    {app.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <DialogFooter className="border-t pt-4 mt-4">
+          {step === 1 ? (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isSaving}
+              >
+                Cancel
+              </Button>
+              <Button type="button" onClick={handleNext} disabled={!isValid}>
+                Next <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleBack}
+                disabled={isSaving}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" /> Back
+              </Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? 'Saving...' : 'Save Plan'}
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </>
+    </Form>
+  )
+}
+
+function getValidationSchema (dateInputType : "DATE" | "DATE_RANGE" = "DATE_RANGE") {
+  const dateInput = dateInputType === "DATE_RANGE"
+    ? yup.object({
+      from: yup.date().required("Please fill the date"),
+      to: yup.date().required("Please fill the date"),
+    }).required()
+    : yup.date().required()
+  return yup.object({
+    planName: yup.string().required('Please enter a plan name'),
+    dateInput,
+    addToCalendar: yup.boolean(),
+  })
+  .required()
+}
+
+// const validationSchema = yup.object({
+//   planName: yup.string().required('Please enter a plan name'),
+//   dateInput: yup
+//     .mixed<Date | DateRange>()
+//     .test({
+//       name: 'has-date',
+//       message: 'Please select schedule day(s)',
+//       test: function (value) {
+//         if (!value) return false
+//         if (value instanceof Date) return true
+//         return [value.from, value.to].every((date) => date instanceof Date)
+//       },
+//     })
+//     .required('Please fill the date'),
+//   addToCalendar: yup.boolean(),
+// })
 
 function generateGoogleCalendarUrl(
   title: string,
@@ -167,251 +415,42 @@ export function SavePlanModal({
   mealPlanTitle = 'My Meal Plan',
 }: SavePlanModalProps) {
   const [step, setStep] = useState(1)
-  const [addToCalendar, setAddToCalendar] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-    reset,
-  } = useForm<FormData>({
-    // @ts-expect-error
-    resolver: yupResolver(schema),
-    defaultValues: {
-      planName: '',
-      dateInput: undefined,
-    },
-  })
-
-  const planName = watch('planName')
-  const dateInput = watch('dateInput')
-
-  const isDateSelected =
-    mode === 'WEEK'
-      ? dateInput &&
-        !(dateInput instanceof Date) &&
-        dateInput?.from &&
-        dateInput?.to
-      : dateInput instanceof Date
+  const formikRef = useRef<FormikProps<FormData>>(null)
 
   const handleClose = () => {
     setStep(1)
-    setAddToCalendar(false)
-    reset()
+    formikRef.current?.resetForm()
     onClose()
-  }
-
-  const handleNext = () => {
-    if (step === 1) {
-      setStep(2)
-    }
-  }
-
-  const handleBack = () => {
-    if (step === 2) {
-      setStep(1)
-    }
-  }
-
-  const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    try {
-      await onSave(data.planName, data.dateInput!)
-    } finally {
-      handleClose()
-    }
-  }
-
-  const handleCalendarAppClick = (app: (typeof calendarApps)[0]) => {
-    if (!dateInput) return
-
-    let startDate: Date
-    let endDate: Date
-
-    if (dateInput instanceof Date) {
-      startDate = dateInput
-      endDate = dateInput
-    } else {
-      startDate = dateInput.from!
-      endDate = dateInput.to!
-    }
-
-    const title = planName || mealPlanTitle
-    const url = app.generateUrl(title, startDate, endDate)
-
-    if (app.id === 'apple') {
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `${title.replace(/\s+/g, '_')}.ics`
-      link.click()
-      URL.revokeObjectURL(url)
-    } else {
-      window.open(url, '_blank')
-    }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
-        {/** @ts-expect-error */}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Save className="w-5 h-5" />
-              {step === 1 ? 'Save Meal Plan' : 'Add to Calendar'}
-            </DialogTitle>
-            <DialogDescription>
-              {step === 1
-                ? 'Give your meal plan a name and select the schedule days.'
-                : 'Choose a calendar app to add your meal plan.'}
-            </DialogDescription>
-          </DialogHeader>
-
-          {step === 1 && (
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="plan-name">
-                  Plan Name <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="plan-name"
-                  placeholder="e.g., Week 1 - Healthy Start"
-                  {...register('planName')}
-                />
-                {errors.planName && (
-                  <p className="text-sm text-destructive">
-                    {errors.planName.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="grid gap-2">
-                <Label className="flex items-center gap-2">
-                  Schedule day(s) <span className="text-destructive">*</span>
-                </Label>
-                {mode === 'WEEK' && !(dateInput instanceof Date) ? (
-                  <>
-                    <DatePickerWithRange
-                      date={dateInput}
-                      onDateChange={(date) => setValue('dateInput', date)}
-                      className={errors.dateInput ? 'border-destructive' : ''}
-                    />
-                    {errors.dateInput && (
-                      <p className="text-sm text-destructive">
-                        {errors.dateInput.message as string}
-                      </p>
-                    )}
-                    {dateInput?.from && dateInput?.to && (
-                      <p className="text-sm text-muted-foreground">
-                        Selected: {format(dateInput.from, 'MMM d, yyyy')} -{' '}
-                        {format(dateInput.to, 'MMM d, yyyy')}
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <DatePicker
-                      date={dateInput as Date}
-                      onDateChange={(date) => setValue('dateInput', date)}
-                      className={errors.dateInput ? 'border-destructive' : ''}
-                    />
-                    {errors.dateInput && (
-                      <p className="text-sm text-destructive">
-                        {errors.dateInput.message as string}
-                      </p>
-                    )}
-                    {dateInput && (
-                      <p className="text-sm text-muted-foreground">
-                        Selected: {format(dateInput as Date, 'MMM d, yyyy')}
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="grid gap-4 py-4">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="add-to-calendar"
-                  checked={addToCalendar}
-                  onCheckedChange={(checked) =>
-                    setAddToCalendar(checked as boolean)
-                  }
-                />
-                <Label
-                  htmlFor="add-to-calendar"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Add to calendar
-                </Label>
-              </div>
-
-              <div className="grid gap-2">
-                <Label className="text-xs text-muted-foreground">
-                  Choose calendar app
-                </Label>
-                <div className="flex flex-wrap gap-2">
-                  {calendarApps.map((app) => (
-                    <Button
-                      key={app.id}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        'gap-2',
-                        app.color,
-                        !addToCalendar &&
-                          isDateSelected &&
-                          'opacity-50 cursor-not-allowed',
-                      )}
-                      disabled={!addToCalendar || !isDateSelected}
-                      onClick={() => handleCalendarAppClick(app)}
-                    >
-                      {app.icon}
-                      {app.name}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="border-t pt-4 mt-4">
-            {step === 1 ? (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  disabled={isSaving}
-                >
-                  Cancel
-                </Button>
-                <Button type="button" onClick={handleNext}>
-                  Next <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleBack}
-                  disabled={isSaving}
-                >
-                  <ChevronLeft className="w-4 h-4 mr-1" /> Back
-                </Button>
-                <Button type="submit" disabled={isSaving}>
-                  {isSaving ? 'Saving...' : 'Save Plan'}
-                </Button>
-              </>
-            )}
-          </DialogFooter>
-        </form>
+        <Formik<FormData>
+          innerRef={formikRef}
+          enableReinitialize
+          initialValues={{
+            planName: '',
+            dateInput: undefined as Date | DateRange | undefined,
+            addToCalendar: false,
+          }}
+          validationSchema={getValidationSchema(mode === 'WEEK' ? 'DATE_RANGE' : 'DATE')}
+          onSubmit={async (values) => {
+            try {
+              await onSave(values.planName, values.dateInput!)
+            } finally {
+              handleClose()
+            }
+          }}
+        >
+          <SavePlanFormContent
+            step={step}
+            setStep={setStep}
+            mode={mode}
+            isSaving={isSaving}
+            onClose={handleClose}
+          />
+        </Formik>
       </DialogContent>
     </Dialog>
   )

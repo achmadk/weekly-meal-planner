@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
 import { motion, AnimatePresence } from 'motion/react'
 import { experimental_useObject as useObject } from '@ai-sdk/react'
 import { Hero } from './Hero'
@@ -279,7 +278,7 @@ export function MealPlannerApp() {
         onSelectRecipe={handleSelectRecommendation}
       />
 
-      <Footer />
+      <Footer withBorder={false} />
     </div>
   )
 }

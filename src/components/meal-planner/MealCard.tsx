@@ -13,9 +13,10 @@ import {
 import type { Recipe, MealType } from './types'
 import { useRecipeImage } from '@/hooks/useRecipeImage'
 import { useAuth } from '@/contexts/user-context'
-import { useEffect, useState } from 'react'
+import { MouseEvent, useEffect, useState } from 'react'
 
 interface MealCardProps {
+  dayName: string
   recipe: Recipe
   mealType: MealType
   onClick: (recipe: Recipe) => void
@@ -24,6 +25,7 @@ interface MealCardProps {
   onLoadComplete?: ((recipe: Recipe) => Promise<void>) | null
   onRecipeBookmarked?: ((recipe: Recipe, isBookmarked?: boolean) => Promise<void>) | null
   disabled?: boolean
+  onSavePlanByDay?: ((input: {dayName: string; mealType?: string }) => void) | null
 }
 
 const mealTypeConfig = {
@@ -48,6 +50,7 @@ const mealTypeConfig = {
 }
 
 export function MealCard({
+  dayName,
   recipe,
   mealType,
   onClick,
@@ -56,6 +59,7 @@ export function MealCard({
   onLoadComplete = null,
   onRecipeBookmarked = null,
   disabled = false,
+  onSavePlanByDay = null,
 }: MealCardProps) {
   const config = mealTypeConfig[mealType]
   const recipeDataIsCompleted = recipe && Object.keys(recipe).length === 12
@@ -67,6 +71,12 @@ export function MealCard({
     recipe,
     isComplete && recipeDataIsCompleted,
   )
+
+  const handleSavePlanEachMealType = (dayName: string) => (e: MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onSavePlanByDay?.({ dayName, mealType: (mealType as string ?? "all").toUpperCase() })
+  }
 
   const handleBookmarkRecipe = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -194,6 +204,7 @@ export function MealCard({
                 <button
                   className="flex-shrink-0 w-10 h-10 rounded-full cursor-pointer bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
                   title="Save plan"
+                  onClick={handleSavePlanEachMealType(dayName)}
                 >
                   <Save size={18} className="text-muted-foreground" />
                 </button>

@@ -1,8 +1,16 @@
+import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
-export function Footer() {
+export interface FooterProps {
+  /**
+   * @default true
+   */
+  withBorder?: boolean
+}
+
+export function Footer({ withBorder = true }: FooterProps) {
   return (
-    <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-border">
+    <footer className={cn("py-8 md:py-12 px-4 md:px-6", withBorder && "border-t border-border")}>
       <div className="max-w-7xl mx-auto text-center space-y-4">
         <p className="text-sm text-muted-foreground">
           Made with ❤️ for food lovers everywhere
