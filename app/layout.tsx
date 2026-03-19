@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Plus_Jakarta_Sans, Lora } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
+import { ui } from '@clerk/ui'
 import { AppProviders } from '@/components/app-providers'
 // import { SerwistProvider } from './serwist'
 
@@ -39,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider {...{ ui }}>
       <html lang="en" suppressHydrationWarning>
         <body
           className={`${plusJakartaSans.variable} ${lora.variable} antialiased min-h-screen relative selection:bg-primary/20 selection:text-primary`}

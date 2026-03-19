@@ -4,7 +4,10 @@ packages:
 onlyBuiltDependencies:
   - '@clerk/shared'
   - '@swc/core'
+  - bufferutil
+  - core-js
   - esbuild
   - protobufjs
   - sharp
+  - utf-8-validate
   - workerd
