@@ -17,3 +17,6 @@ todos.json
 .wrangler
 
 drizzle
+
+test-results
+playwright-report
