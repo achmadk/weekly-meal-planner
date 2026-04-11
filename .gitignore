@@ -20,3 +20,5 @@ drizzle
 
 test-results
 playwright-report
+# clerk configuration (can include secrets)
+/.clerk/

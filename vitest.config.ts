@@ -1,5 +1,5 @@
-import { Plugin } from 'vite'
-import { defineConfig } from 'vitest/config'
+import { Plugin } from 'vite-plus'
+import { defineConfig } from 'vite-plus'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 

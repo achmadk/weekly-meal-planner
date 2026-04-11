@@ -1,16 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vite-plus/test'
 import { render, screen } from '@testing-library/react'
 import { SavePlanModal } from './SavePlanModal'
 import { ReactNode } from 'react'
 
 vi.mock('formik', async () => {
   return {
-    Form: ({ children }: { children: ReactNode }) => (
-      <form>{children}</form>
-    ),
-    Formik: ({ children }: { children: ReactNode }) => (
-      <div>{children}</div>
-    ),
+    Form: ({ children }: { children: ReactNode }) => <form>{children}</form>,
+    Formik: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     useFormikContext: () => ({
       getFieldProps: vi.fn(() => ({
         name: 'test',

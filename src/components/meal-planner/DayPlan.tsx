@@ -60,6 +60,7 @@ export function DayPlan({
     ].filter((meal) => meal !== null && Object.keys(meal).length === 12)
       .length ?? 0
   const isLoadingEachDay = mealCount < 3
+  const breakfastReady = mealCount === 1
 
   const sharedMealCardProps = {
     dayName: dayPlan.day,
@@ -77,10 +78,10 @@ export function DayPlan({
   }
 
   useEffect(() => {
-    if (isLoadingEachDay) {
+    if (breakfastReady) {
       onInitialLoadingEachDay?.(dayIndex)
     }
-  }, [isLoadingEachDay])
+  }, [breakfastReady])
 
   return (
     <motion.div

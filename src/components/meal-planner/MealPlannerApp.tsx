@@ -39,6 +39,7 @@ export function MealPlannerApp() {
         const remainingCount = prev - 1
         if (isSignedIn) {
           try {
+            // oxlint-disable-next-line typescript/no-floating-promises
             fetch('/api/v1/generation-limits', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -52,6 +53,7 @@ export function MealPlannerApp() {
             console.error('Failed to decrement limit:', error)
           }
         }
+        // oxlint-disable-next-line typescript/no-floating-promises
         setStoredRemainingCount(remainingCount)
         return remainingCount
       })
@@ -186,11 +188,13 @@ export function MealPlannerApp() {
   }
 
   useEffect(() => {
+    // oxlint-disable-next-line typescript/no-floating-promises
     loadRemainingCount()
   }, [])
 
   useEffect(() => {
     if (isSignedIn) {
+      // oxlint-disable-next-line typescript/no-floating-promises
       loadRemainingCount()
     }
   }, [isSignedIn])
